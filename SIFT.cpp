@@ -19,10 +19,15 @@ int main(int argc, char *argv[])
   Mat image1 = imread("dial.png");
   Mat image2 = imread("10.jpg");
 
+  if(image1.empty() || image2.empty())
+  {
+      printf("Can't read one of the images\n");
+      return -1;
+  }
+
   // Create smart pointer for feature detector.
-  Ptr<FeatureDetector> featureDetector = FeatureDetector::create("STAR");
+  Ptr<FeatureDetector> featureDetector = FeatureDetector::create("SIFT");
   vector<KeyPoint> keypoints1, keypoints2;
-//  vector<KeyPoint> keypoints2;
 
   // Detect the keypoints
   featureDetector->detect(image1, keypoints1); // NOTE: featureDetector is a pointer hence the '->'.
@@ -38,8 +43,7 @@ int main(int argc, char *argv[])
   featureExtractor->compute(image2, keypoints2, descriptors2);
 
   // If you would like to draw the detected keypoint just to check
-  Mat outputImage1;
-  Mat outputImage2;
+  Mat outputImage1, outputImage2;
 
   Scalar keypointColor1 = Scalar(255, 0, 0);     // Blue keypoints.
   Scalar keypointColor2 = Scalar(0, 0, 255);     // Blue keypoints.
