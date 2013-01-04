@@ -1,0 +1,26 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Fotos
+*.jpg
+*.png
+
+# Carpetas del IDE
+/bin
+/obj
+
+# Layout
+*.layout
+*.depend
+*.cbp
