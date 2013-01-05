@@ -19,8 +19,8 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-  Mat img_object = imread("dial.png");
-  Mat img_scene = imread("27.jpg");
+  Mat img_object = imread("diales2.png", 0);
+  Mat img_scene = imread("27.jpg", 0);
 
   if(img_object.empty() || img_scene.empty())
   {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 //  destroyWindow("Output1");
 
   //matching descriptors
-  Ptr<DescriptorMatcher> featureMatcher = DescriptorMatcher::create("BruteForce");
+  Ptr<DescriptorMatcher> featureMatcher = DescriptorMatcher::create("FlannBased");
   vector<DMatch> matches;
   featureMatcher->match( descriptors_object, descriptors_scene, matches );
 
@@ -131,8 +131,10 @@ int main(int argc, char *argv[])
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
   vector<Point2f> obj_corners(4);
-  obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint( img_object.cols, 0 );
-  obj_corners[2] = cvPoint( img_object.cols, img_object.rows ); obj_corners[3] = cvPoint( 0, img_object.rows );
+  obj_corners[0] = cvPoint(0,0);
+  obj_corners[1] = cvPoint( img_object.cols, 0 );
+  obj_corners[2] = cvPoint( img_object.cols, img_object.rows );
+  obj_corners[3] = cvPoint( 0, img_object.rows );
   vector<Point2f> scene_corners(4);
 
   perspectiveTransform( obj_corners, scene_corners, H);
