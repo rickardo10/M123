@@ -20,7 +20,7 @@ using namespace cv;
 int main(int argc, char *argv[])
 {
   Mat img_object = imread("dial.png");
-  Mat img_scene = imread("27.jpg");
+  Mat img_scene = imread("dial.png");
 
   if(img_object.empty() || img_scene.empty())
   {
@@ -97,17 +97,17 @@ int main(int argc, char *argv[])
   printf("-- Min dist : %f \n", min_dist );
 
   //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
-  std::vector< DMatch > good_matches;
+  vector< DMatch > good_matches;
 
   for( int i = 0; i < descriptors_object.rows; i++ )
   { if( matches[i].distance < 3*min_dist )
      { good_matches.push_back( matches[i]); }
   }
 
-  Mat img_matches;
-  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
-               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+//  Mat img_matches;
+//  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+//               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+//               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 //
 //  namedWindow("matches", 1);
 //  imshow("matches", img_matches);
@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
 //  waitKey(0);
 
   //-- Localize the object
-  std::vector<Point2f> obj;
-  std::vector<Point2f> scene;
+  vector<Point2f> obj;
+  vector<Point2f> scene;
 
   for( int i = 0; i < good_matches.size(); i++ )
   {
@@ -132,18 +132,19 @@ int main(int argc, char *argv[])
   Mat H = findHomography( obj, scene, CV_RANSAC );
 
   //-- Get the corners from the image_1 ( the object to be "detected" )
-  std::vector<Point2f> obj_corners(4);
+  vector<Point2f> obj_corners(4);
   obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint( img_object.cols, 0 );
   obj_corners[2] = cvPoint( img_object.cols, img_object.rows ); obj_corners[3] = cvPoint( 0, img_object.rows );
-  std::vector<Point2f> scene_corners(4);
+  vector<Point2f> scene_corners(4);
 
   perspectiveTransform( obj_corners, scene_corners, H);
 
   //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar(0, 255, 0), 4 );
-  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
-  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
-  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
+  Mat img_matches = imread("7.jpg");//Reads the scene in order to draw on the lines that segment the objects found
+  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar(0, 255, 0), 1 );
+  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 1 );
+  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 1 );
+  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 1 );
 
   //-- Show detected matches
   imshow( "Good Matches & Object detection", img_matches );
