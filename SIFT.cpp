@@ -11,6 +11,7 @@ and the object and find matches.
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv2/calib3d/calib3d.hpp>
 #include <vector>
 
 using namespace std;
@@ -18,10 +19,10 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-  Mat image1 = imread("dial.png");
-  Mat image2 = imread("27.jpg");
+  Mat img_object = imread("dial.png");
+  Mat img_scene = imread("27.jpg");
 
-  if(image1.empty() || image2.empty())
+  if(img_object.empty() || img_scene.empty())
   {
       printf("Can't read one of the images\n");
       return -1;
@@ -29,39 +30,39 @@ int main(int argc, char *argv[])
 
   // Create smart pointer for feature detector.
   Ptr<FeatureDetector> featureDetector = FeatureDetector::create("SIFT");
-  vector<KeyPoint> keypoints1, keypoints2;
+  vector<KeyPoint> keypoints_object, keypoints_scene;
 
   // Detect the keypoints
-  featureDetector->detect(image1, keypoints1); // NOTE: featureDetector is a pointer hence the '->'.
-  featureDetector->detect(image2, keypoints2);
+  featureDetector->detect(img_object, keypoints_object); // NOTE: featureDetector is a pointer hence the '->'.
+  featureDetector->detect(img_scene, keypoints_scene);
 
   //Similarly, we create a smart pointer to the extractor.
   Ptr<DescriptorExtractor> featureExtractor = DescriptorExtractor::create("SIFT");
 
   // Compute the 128 dimension descriptor at each keypoint.
   // Each row in "descriptors" correspond to the descriptor for each keypoint
-  Mat descriptors1, descriptors2;
-  featureExtractor->compute(image1, keypoints1, descriptors1);
-  featureExtractor->compute(image2, keypoints2, descriptors2);
+  Mat descriptors_object, descriptors_scene;
+  featureExtractor->compute(img_object, keypoints_object, descriptors_object);
+  featureExtractor->compute(img_scene, keypoints_scene, descriptors_scene);
 
 //  // If you would like to draw the detected keypoint just to check
-//  Mat outputImage1, outputImage2;
+//  Mat output_object, output_scene;
 //
 //  Scalar keypointColor1 = Scalar(255, 0, 0);     // Blue keypoints.
 //  Scalar keypointColor2 = Scalar(0, 0, 255);     // Blue keypoints.
 //
-//  drawKeypoints(image1, keypoints1, outputImage1, keypointColor1, DrawMatchesFlags::DEFAULT);
-//  drawKeypoints(image2, keypoints2, outputImage2, keypointColor2, DrawMatchesFlags::DEFAULT);
+//  drawKeypoints(img_object, keypoints_object, output_object, keypointColor1, DrawMatchesFlags::DEFAULT);
+//  drawKeypoints(img_scene, keypoints_scene, output_scene, keypointColor2, DrawMatchesFlags::DEFAULT);
 //
 //  namedWindow("Output1");
-//  imshow("Output1", outputImage1);
+//  imshow("Output1", output_object);
 //
 //  char c = ' ';
 //  while ((c = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
 //
 //  destroyWindow("Output1");
 //  namedWindow("Output2");
-//  imshow("Output2", outputImage2);
+//  imshow("Output2", output_scene);
 //  char r = ' ';
 //  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
 //  destroyWindow("Output1");
@@ -69,20 +70,85 @@ int main(int argc, char *argv[])
   //matching descriptors
   Ptr<DescriptorMatcher> featureMatcher = DescriptorMatcher::create("BruteForce");
   vector<DMatch> matches;
-  featureMatcher->match( descriptors1, descriptors2, matches );
+  featureMatcher->match( descriptors_object, descriptors_scene, matches );
 
-  // drawing the resulting matches
-  namedWindow("matches", 1);
+//  // drawing the resulting matches
+//  namedWindow("matches", 1);
+//  Mat img_matches;
+//  drawMatches(img_object, keypoints_object, img_scene, keypoints_scene, matches, img_matches);
+//  imshow("matches", img_matches);
+//
+//  char r = ' ';
+//  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//
+//  destroyWindow("Output1");
+//  waitKey(0);
+
+   //-- Quick calculation of max and min distances between keypoints
+  double max_dist = 0; double min_dist = 100;
+
+  for( int i = 0; i < descriptors_object.rows; i++ )
+  { double dist = matches[i].distance;
+    if( dist < min_dist ) min_dist = dist;
+    if( dist > max_dist ) max_dist = dist;
+  }
+
+  printf("-- Max dist : %f \n", max_dist );
+  printf("-- Min dist : %f \n", min_dist );
+
+  //-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+  std::vector< DMatch > good_matches;
+
+  for( int i = 0; i < descriptors_object.rows; i++ )
+  { if( matches[i].distance < 3*min_dist )
+     { good_matches.push_back( matches[i]); }
+  }
+
   Mat img_matches;
-  drawMatches(image1, keypoints1, image2, keypoints2, matches, img_matches);
-  imshow("matches", img_matches);
+  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+//
+//  namedWindow("matches", 1);
+//  imshow("matches", img_matches);
+//
+//  char r = ' ';
+//  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//
+//  destroyWindow("Output1");
+//  waitKey(0);
 
-  char r = ' ';
-  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+  //-- Localize the object
+  std::vector<Point2f> obj;
+  std::vector<Point2f> scene;
 
-  destroyWindow("Output1");
+  for( int i = 0; i < good_matches.size(); i++ )
+  {
+    //-- Get the keypoints from the good matches
+    obj.push_back( keypoints_object[ good_matches[i].queryIdx ].pt );
+    scene.push_back( keypoints_scene[ good_matches[i].trainIdx ].pt );
+  }
+
+  Mat H = findHomography( obj, scene, CV_RANSAC );
+
+  //-- Get the corners from the image_1 ( the object to be "detected" )
+  std::vector<Point2f> obj_corners(4);
+  obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint( img_object.cols, 0 );
+  obj_corners[2] = cvPoint( img_object.cols, img_object.rows ); obj_corners[3] = cvPoint( 0, img_object.rows );
+  std::vector<Point2f> scene_corners(4);
+
+  perspectiveTransform( obj_corners, scene_corners, H);
+
+  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar(0, 255, 0), 4 );
+  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
+  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
+  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
+
+  //-- Show detected matches
+  imshow( "Good Matches & Object detection", img_matches );
+
   waitKey(0);
-
   return 0;
 
 }
