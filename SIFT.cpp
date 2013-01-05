@@ -2,7 +2,8 @@
 Date: 04/01/2013
 Creator: Ricardo Antonio Ocampo Vega
 Description: Detects the keypoints of an image. After, extracts the
-keypoints descriptors. Finally, draw the detected keypoints on the image
+keypoints descriptors. Finally, compares the keypoints of the scene
+and the object and find matches.
 */
 
 #include <stdio.h>
@@ -18,7 +19,7 @@ using namespace cv;
 int main(int argc, char *argv[])
 {
   Mat image1 = imread("dial.png");
-  Mat image2 = imread("10.jpg");
+  Mat image2 = imread("27.jpg");
 
   if(image1.empty() || image2.empty())
   {
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
   }
 
   // Create smart pointer for feature detector.
-  Ptr<FeatureDetector> featureDetector = FeatureDetector::create("ORB");
+  Ptr<FeatureDetector> featureDetector = FeatureDetector::create("SIFT");
   vector<KeyPoint> keypoints1, keypoints2;
 
   // Detect the keypoints
@@ -75,6 +76,11 @@ int main(int argc, char *argv[])
   Mat img_matches;
   drawMatches(image1, keypoints1, image2, keypoints2, matches, img_matches);
   imshow("matches", img_matches);
+
+  char r = ' ';
+  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+
+  destroyWindow("Output1");
   waitKey(0);
 
   return 0;
