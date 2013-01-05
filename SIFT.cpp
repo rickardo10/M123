@@ -20,7 +20,7 @@ using namespace cv;
 int main(int argc, char *argv[])
 {
   Mat img_object = imread("dial.png");
-  Mat img_scene = imread("dial.png");
+  Mat img_scene = imread("27.jpg");
 
   if(img_object.empty() || img_scene.empty())
   {
@@ -72,9 +72,9 @@ int main(int argc, char *argv[])
   vector<DMatch> matches;
   featureMatcher->match( descriptors_object, descriptors_scene, matches );
 
-//  // drawing the resulting matches
+//  //drawing the resulting matches
 //  namedWindow("matches", 1);
-//  Mat img_matches;
+  Mat img_matches;
 //  drawMatches(img_object, keypoints_object, img_scene, keypoints_scene, matches, img_matches);
 //  imshow("matches", img_matches);
 //
@@ -100,24 +100,22 @@ int main(int argc, char *argv[])
   vector< DMatch > good_matches;
 
   for( int i = 0; i < descriptors_object.rows; i++ )
-  { if( matches[i].distance < 3*min_dist )
+  { if( matches[i].distance <= 3*min_dist )
      { good_matches.push_back( matches[i]); }
   }
 
-//  Mat img_matches;
-//  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
-//               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-//               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-//
+  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+               good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+               vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+
 //  namedWindow("matches", 1);
 //  imshow("matches", img_matches);
 //
-//  char r = ' ';
-//  while ((r = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//  char s = ' ';
+//  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
 //
 //  destroyWindow("Output1");
-//  waitKey(0);
-
+//
   //-- Localize the object
   vector<Point2f> obj;
   vector<Point2f> scene;
@@ -140,7 +138,7 @@ int main(int argc, char *argv[])
   perspectiveTransform( obj_corners, scene_corners, H);
 
   //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-  Mat img_matches = imread("7.jpg");//Reads the scene in order to draw on the lines that segment the objects found
+  //Mat img_matches = imread("7.jpg");//Reads the scene in order to draw on the lines that segment the objects found
   line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar(0, 255, 0), 1 );
   line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 1 );
   line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 1 );
