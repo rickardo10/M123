@@ -23,6 +23,11 @@ private:
    Mat result;
    Mat descriptors_object;
    Mat descriptors_scene;
+   Mat dial1;
+   Mat dial2;
+   Mat dial3;
+   Mat dial4;
+   Mat dial5;
    Mat H;
    vector<KeyPoint> keypoints_object;
    vector<KeyPoint> keypoints_scene;

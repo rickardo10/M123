@@ -7,6 +7,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include "matcher.h"
+#include <math.h>
 
 using namespace std;
 using namespace cv;
@@ -61,23 +62,47 @@ void matcher::match( const string matcher_tool, const string objeto, const strin
 
   perspectiveTransform( object_corners, scene_corners, H);
 
-  namedWindow("matches", 1);
+//  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+//  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+//  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+//  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+//  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+//
+//  //-- Resize image
+//  Size_<int> dsize = Size( round( img_matches.cols / 2 ) , round( img_matches.rows / 2 ) );
+//  resize( img_matches, result, dsize );
+//  imshow( "Good Matches", result );
+//
+//  char s = ' ';
+//  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//
+//  destroyWindow("Good Matches");
 
-  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+  int xInit = round(scene_corners[0].x);
+  int xFin = round(scene_corners[2].x);
+  int yInit = round(scene_corners[0].y);
+  int yFin = round(scene_corners[2].y);
 
-  //-- Resize image
-  Size_<int> dsize = Size( round( img_matches.cols / 2 ) , round( img_matches.rows / 2 ) );
-  resize( img_matches, result, dsize );
-  imshow( "Good Matches", result );
+  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
+  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
+  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
+  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
+  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
 
-  char s = ' ';
-  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+  imshow("test", dial1);
+  waitKey(0);
 
-  destroyWindow("Output1");
+  imshow("test", dial2);
+  waitKey(0);
+
+  imshow("test", dial3);
+  waitKey(0);
+
+  imshow("test", dial4);
+  waitKey(0);
+
+  imshow("test", dial5);
+  waitKey(0);
 }
 
 
