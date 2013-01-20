@@ -13,7 +13,7 @@ using namespace std;
 using namespace cv;
 
 
-void matcher::match( const string matcher_tool, const string objeto, const string escena )
+void matcher::match( const string matcher_tool, const string objeto, const string escena, float desv)
 {
   Mat img_object = imread(objeto);
   Mat img_scene  = imread(escena);
@@ -28,10 +28,6 @@ void matcher::match( const string matcher_tool, const string objeto, const strin
     if( dist < min_dist ) min_dist = dist;
     if( dist > max_dist ) max_dist = dist;
   }
-
-  float desv;
-  cout << endl << "Escriba un valor para la desviación:\n? ";
-  cin >> desv;
 
   for( int i = 0; i < descriptors_object.rows; i++ )
   { if( matches[i].distance <= desv*min_dist )
@@ -62,47 +58,47 @@ void matcher::match( const string matcher_tool, const string objeto, const strin
 
   perspectiveTransform( object_corners, scene_corners, H);
 
-//  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-//  line( img_matches, scene_corners[0] + Point2f( img_object.cols, 0), scene_corners[1] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-//  line( img_matches, scene_corners[1] + Point2f( img_object.cols, 0), scene_corners[2] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-//  line( img_matches, scene_corners[2] + Point2f( img_object.cols, 0), scene_corners[3] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
-//  line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 2 );
+  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+  line( img_scene, scene_corners[0], scene_corners[1], Scalar( 0, 255, 0), 2 );
+  line( img_scene, scene_corners[1], scene_corners[2], Scalar( 0, 255, 0), 2 );
+  line( img_scene, scene_corners[2], scene_corners[3], Scalar( 0, 255, 0), 2 );
+  line( img_scene, scene_corners[3], scene_corners[0], Scalar( 0, 255, 0), 2 );
+
+  //-- Resize image
+  Size_<int> dsize = Size( round( img_scene.cols / 2 ) , round( img_scene.rows / 2 ) );
+  resize( img_scene, result, dsize );
+  imshow( "Good Matches", result );
+
+  char s = ' ';
+  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+
+  destroyWindow("Good Matches");
+
+//  int xInit = round(scene_corners[0].x);
+//  int xFin = round(scene_corners[2].x);
+//  int yInit = round(scene_corners[0].y);
+//  int yFin = round(scene_corners[2].y);
 //
-//  //-- Resize image
-//  Size_<int> dsize = Size( round( img_matches.cols / 2 ) , round( img_matches.rows / 2 ) );
-//  resize( img_matches, result, dsize );
-//  imshow( "Good Matches", result );
+//  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
+//  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
+//  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
+//  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
+//  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
 //
-//  char s = ' ';
-//  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//  imshow("test", dial1);
+//  waitKey(0);
 //
-//  destroyWindow("Good Matches");
-
-  int xInit = round(scene_corners[0].x);
-  int xFin = round(scene_corners[2].x);
-  int yInit = round(scene_corners[0].y);
-  int yFin = round(scene_corners[2].y);
-
-  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
-  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
-  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
-  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
-  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
-
-  imshow("test", dial1);
-  waitKey(0);
-
-  imshow("test", dial2);
-  waitKey(0);
-
-  imshow("test", dial3);
-  waitKey(0);
-
-  imshow("test", dial4);
-  waitKey(0);
-
-  imshow("test", dial5);
-  waitKey(0);
+//  imshow("test", dial2);
+//  waitKey(0);
+//
+//  imshow("test", dial3);
+//  waitKey(0);
+//
+//  imshow("test", dial4);
+//  waitKey(0);
+//
+//  imshow("test", dial5);
+//  waitKey(0);
 }
 
 

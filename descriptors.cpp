@@ -13,11 +13,7 @@ using namespace cv;
 void descriptors::setImage( const string name_source )
 {
 	img_source = imread( name_source, 0);
-	if(img_source.empty() )
-  {
-    printf("Can't read the image\n");
-    exit;
-  }
+
 }
 
 

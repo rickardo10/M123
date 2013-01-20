@@ -12,7 +12,7 @@ class matcher
 {
 public:
 
-	void match( const string matcher_tool, const string objeto, const string escena );
+	void match( const string matcher_tool, const string objeto, const string escena, float desv );
 	void setInitialData( vector<KeyPoint> keypoints_obj, vector<KeyPoint> keypoints_sce, Mat ob, Mat sc );
 
 private:
