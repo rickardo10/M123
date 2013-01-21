@@ -13,10 +13,15 @@ using namespace std;
 using namespace cv;
 
 
-void matcher::match( const string matcher_tool, const string objeto, const string escena, float desv)
+int matcher::match( const string matcher_tool, const string objeto, const string escena, float desv)
 {
   Mat img_object = imread(objeto, 0);
   Mat img_scene  = imread(escena, 0);
+
+  if( img_scene.empty() ){
+      puts("Can't read the image");
+      return -1;
+  }
 
   Ptr<DescriptorMatcher> featureMatcher = DescriptorMatcher::create( matcher_tool );
   featureMatcher->match( descriptors_object, descriptors_scene, matches );
@@ -34,9 +39,9 @@ void matcher::match( const string matcher_tool, const string objeto, const strin
      { good_matches.push_back( matches[i]); }
   }
 
-  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
-            good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
-            vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+//  drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+//            good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
+//            vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
   //-- Localize the object
   for( int i = 0; i < good_matches.size(); i++ )
@@ -57,80 +62,84 @@ void matcher::match( const string matcher_tool, const string objeto, const strin
   object_corners[3] = cvPoint( 0, img_object.rows );
 
   perspectiveTransform( object_corners, scene_corners, H);
+
+  if( ( scene_corners[2].x - scene_corners[3].x ) == 0  ){
+    cout << "!Div0" << endl;
+    puts("Bad segmentation, try again!");
+    return -2;
+  }
+
+  if(((scene_corners[1].x - scene_corners[0].x) / (scene_corners[2].x - scene_corners[3].x)) < 0.9 ||
+        ((scene_corners[1].x - scene_corners[0].x) / (scene_corners[2].x - scene_corners[3].x)) > 1.1){
+    puts("Bad segmentation, try again!");
+    return -2;
+  }
+
+    if(((scene_corners[3].y - scene_corners[0].y) / (scene_corners[2].y - scene_corners[1].y)) < 0.9 ||
+        ((scene_corners[3].y - scene_corners[0].y) / (scene_corners[2].y - scene_corners[1].y)) > 1.1){
+    puts("Bad segmentation, try again!");
+    return -2;
+  }
+
+
+
+  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
+  line( img_scene, scene_corners[0], scene_corners[1], Scalar( 0, 255, 0, 255), 2 );
+  line( img_scene, scene_corners[1], scene_corners[2], Scalar( 0, 255, 0, 255), 2 );
+  line( img_scene, scene_corners[2], scene_corners[3], Scalar( 0, 255, 0, 255), 2 );
+  line( img_scene, scene_corners[3], scene_corners[0], Scalar( 0, 255, 0, 255), 2 );
+
+  //-- Resize image
+  Size_<int> dsize = Size( round( img_scene.cols / 2 ) , round( img_scene.rows / 2 ) );
+  resize( img_scene, result, dsize );
+  imshow( "Good Matches", result );
+  moveWindow("Good Matches", 500, 0 );
+
+  char s = ' ';
+  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+
+  destroyWindow("Good Matches");
+
+//  int xInit = round(scene_corners[0].x);
+//  int xFin = round(scene_corners[2].x);
+//  int yInit = round(scene_corners[0].y);
+//  int yFin = round(scene_corners[2].y);
 //
-//  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-//  line( img_scene, scene_corners[0], scene_corners[1], Scalar( 0, 255, 0), 2 );
-//  line( img_scene, scene_corners[1], scene_corners[2], Scalar( 0, 255, 0), 2 );
-//  line( img_scene, scene_corners[2], scene_corners[3], Scalar( 0, 255, 0), 2 );
-//  line( img_scene, scene_corners[3], scene_corners[0], Scalar( 0, 255, 0), 2 );
-
-//  //-- Resize image
-//  Size_<int> dsize = Size( round( img_scene.cols / 2 ) , round( img_scene.rows / 2 ) );
-//  resize( img_scene, result, dsize );
-//  imshow( "Good Matches", result );
-
-//  char s = ' ';
-//  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
+//  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
+//  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
+//  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
+//  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
 //
-//  destroyWindow("Good Matches");
-
-  int xInit = round(scene_corners[0].x);
-  int xFin = round(scene_corners[2].x);
-  int yInit = round(scene_corners[0].y);
-  int yFin = round(scene_corners[2].y);
-
-  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
-  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
-  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
-  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
-  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
-
-
-//  imshow("test", dial1);
+//  Mat dial1T, dial2T, dial3T, dial4T, dial5T;
+//
+//  threshold(dial1, dial1T, 0, 255,  THRESH_OTSU);
+//  threshold(dial2, dial2T, 0, 255,  THRESH_OTSU);
+//  threshold(dial3, dial3T, 0, 255,  THRESH_OTSU);
+//  threshold(dial4, dial4T, 0, 255,  THRESH_OTSU);
+//  threshold(dial5, dial5T, 0, 255,  THRESH_OTSU);
+//
+//  Mat erode1, erode2, erode3, erode4, erode5;
+//
+//  Mat element = getStructuringElement(MORPH_CROSS,
+//                        Size(3, 3));
+//
+//  dilate(dial1T, erode1, element, Point(-1,-1), 1);
+//  dilate(dial2T, erode2, element, Point(-1,-1), 1);
+//  dilate(dial3T, erode3, element, Point(-1,-1), 1);
+//  dilate(dial4T, erode4, element, Point(-1,-1), 1);
+//  dilate(dial5T, erode5, element, Point(-1,-1), 1);
+//
+//  imshow("Ero", erode1);
 //  waitKey(0);
-//
-//  imshow("test", dial2);
+//  imshow("Ero", erode2);
 //  waitKey(0);
-//
-//  imshow("test", dial3);
+//  imshow("Ero", erode3);
 //  waitKey(0);
-//
-//  imshow("test", dial4);
+//  imshow("Ero", erode4);
 //  waitKey(0);
-//  imshow("test", dial5);
-//
+//  imshow("Ero", erode5);
 //  waitKey(0);
-
-  Mat dial1T, dial2T, dial3T, dial4T, dial5T;
-
-  threshold(dial1, dial1T, 0, 255,  THRESH_OTSU);
-  threshold(dial2, dial2T, 0, 255,  THRESH_OTSU);
-  threshold(dial3, dial3T, 0, 255,  THRESH_OTSU);
-  threshold(dial4, dial4T, 0, 255,  THRESH_OTSU);
-  threshold(dial5, dial5T, 0, 255,  THRESH_OTSU);
-
-  Mat erode1, erode2, erode3, erode4, erode5;
-
-  Mat element = getStructuringElement(MORPH_CROSS,
-                        Size(3, 3));
-
-  dilate(dial1T, erode1, element, Point(-1,-1), 0);
-  dilate(dial2T, erode2, element, Point(-1,-1), 0);
-  dilate(dial3T, erode3, element, Point(-1,-1), 0);
-  dilate(dial4T, erode4, element, Point(-1,-1), 0);
-  dilate(dial5T, erode5, element, Point(-1,-1), 0);
-
-  imshow("Ero", erode1);
-  waitKey(0);
-  imshow("Ero", erode2);
-  waitKey(0);
-  imshow("Ero", erode3);
-  waitKey(0);
-  imshow("Ero", erode4);
-  waitKey(0);
-  imshow("Ero", erode5);
-  waitKey(0);
-
 }
 
 

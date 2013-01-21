@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
 //  cin >> desc;
 //  printf("\nEscriba el método de Match\nHINT:Algunos métodos son BruteForce, BruteForce-L1, BruteForce-Hamming,\nBruteForce-Hamming(2), FlannBased\n? ");
 //  cin >> mtch;
-  ftd = "SIFT";
-  desc = "SIFT";
-  mtch = "BruteForce";
+  ftd = "HARRIS";
+  desc = "BRIEF";
+  mtch = "BruteForce-Hamming";
 
   float desv;
   cout << endl << "Escriba un valor para la desviación:\n? ";
@@ -53,11 +53,6 @@ int main(int argc, char *argv[])
     sstm << i << extension;
     scn = sstm.str();
 
-    if( imread(scn).empty() ){
-        puts("Can't read the image");
-        continue;
-    }
-
     descriptors object;
     object.setImage(obj);
     object.featureDetector(ftd);
@@ -68,7 +63,6 @@ int main(int argc, char *argv[])
   //  if( si == 1 ){
   //    object.writeKeypoints();
   //  }
-
     object.findDescriptors(desc);
 
     //--Obtención de descriptores de la escena
@@ -88,6 +82,10 @@ int main(int argc, char *argv[])
     //--Detección de similitudes
     matcher match1;
     match1.setInitialData( object.getKeypoints(), scene.getKeypoints(), object.getDescriptors(), scene.getDescriptors());
-    match1.match(mtch, obj, scn, desv);
+
+    if( match1.match(mtch, obj, scn, desv) == -1 ){
+      puts("Can't read the image");
+      continue;
+    }
   }
 }
