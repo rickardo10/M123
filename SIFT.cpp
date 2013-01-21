@@ -82,9 +82,15 @@ int main(int argc, char *argv[])
     //--Detección de similitudes
     matcher match1;
     match1.setInitialData( object.getKeypoints(), scene.getKeypoints(), object.getDescriptors(), scene.getDescriptors());
+    int result = match1.match(mtch, obj, scn, desv);
 
-    if( match1.match(mtch, obj, scn, desv) == -1 ){
+    if( result == -1 ){
       puts("Can't read the image");
+      continue;
+    }
+
+    if( result == -2 ){
+      puts("Bad Segmentation, try again!");
       continue;
     }
   }

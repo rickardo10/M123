@@ -64,20 +64,16 @@ int matcher::match( const string matcher_tool, const string objeto, const string
   perspectiveTransform( object_corners, scene_corners, H);
 
   if( ( scene_corners[2].x - scene_corners[3].x ) == 0  ){
-    cout << "!Div0" << endl;
-    puts("Bad segmentation, try again!");
     return -2;
   }
 
   if(((scene_corners[1].x - scene_corners[0].x) / (scene_corners[2].x - scene_corners[3].x)) < 0.9 ||
         ((scene_corners[1].x - scene_corners[0].x) / (scene_corners[2].x - scene_corners[3].x)) > 1.1){
-    puts("Bad segmentation, try again!");
     return -2;
   }
 
     if(((scene_corners[3].y - scene_corners[0].y) / (scene_corners[2].y - scene_corners[1].y)) < 0.9 ||
         ((scene_corners[3].y - scene_corners[0].y) / (scene_corners[2].y - scene_corners[1].y)) > 1.1){
-    puts("Bad segmentation, try again!");
     return -2;
   }
 
@@ -95,8 +91,8 @@ int matcher::match( const string matcher_tool, const string objeto, const string
   imshow( "Good Matches", result );
   moveWindow("Good Matches", 500, 0 );
 
-  char s = ' ';
-  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+//  char s = ' ';
+//  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
 
   destroyWindow("Good Matches");
 
