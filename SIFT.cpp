@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   cout << endl << "Escriba un valor para la desviación:\n? ";
   cin >> desv;
 
-  for( int i = 0; i <= 158; i++ ){
+  for( int i = 0; i <= 160; i++ ){
     //--Obtención de descriptores del objeto
     stringstream sstm;
     sstm << i << extension;
