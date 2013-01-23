@@ -85,12 +85,12 @@ int main(int argc, char *argv[])
     int result = match1.match(mtch, obj, scn, desv);
 
     if( result == -1 ){
-      puts("Can't read the image");
+      printf("[%3d] Can't read the image\n", i);
       continue;
     }
 
     if( result == -2 ){
-      puts("Bad Segmentation, try again!");
+      printf("[%3d] Bad Segmentation, try again!\n", i);
       continue;
     }
   }
