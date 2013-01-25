@@ -49,6 +49,10 @@ int main(int argc, char *argv[])
 
   for( int i = 0; i <= 160; i++ ){
     //--Obtención de descriptores del objeto
+    if(i == 111){
+      continue;
+    }
+
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();

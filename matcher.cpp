@@ -112,7 +112,6 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
   Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
 
-
   Mat dial1T, dial2T, dial3T, dial4T, dial5T;
 
   threshold(dial1, dial1T, 0, 255,  THRESH_OTSU);
@@ -124,38 +123,92 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   Mat erode1, erode2, erode3, erode4, erode5;
 
   Mat element = getStructuringElement(MORPH_CROSS,
-                        Size(30, 30));
+                        Size(10, 10));
 
-  dilate(dial1T, erode1, element, Point(-1,-1), 0);
-  dilate(dial2T, erode2, element, Point(-1,-1), 0);
-  dilate(dial3T, erode3, element, Point(-1,-1), 0);
-  dilate(dial4T, erode4, element, Point(-1,-1), 0);
-  dilate(dial5T, erode5, element, Point(-1,-1), 0);
+  dilate(dial1T, erode1, element, Point(-1,-1), 1);
+  dilate(dial2T, erode2, element, Point(-1,-1), 1);
+  dilate(dial3T, erode3, element, Point(-1,-1), 1);
+  dilate(dial4T, erode4, element, Point(-1,-1), 1);
+  dilate(dial5T, erode5, element, Point(-1,-1), 1);
+
+  Point Black1 = test(erode1, erode1.cols / 2, erode1.rows / 2);
+  Point Black2 = test(erode2, erode2.cols / 2, erode2.rows / 2);
+  Point Black3 = test(erode3, erode3.cols / 2, erode3.rows / 2);
+  Point Black4 = test(erode4, erode4.cols / 2, erode4.rows / 2);
+  Point Black5 = test(erode5, erode5.cols / 2, erode5.rows / 2);
 
   try{
-    floodFill(erode1, Point(erode1.rows / 2, erode1.cols / 2), 150);
-    floodFill(erode2, Point(erode2.rows / 2, erode2.cols / 2), 150);
-    floodFill(erode3, Point(erode3.rows / 2, erode3.cols / 2), 150);
-    floodFill(erode4, Point(erode4.rows / 2, erode4.cols / 2), 150);
-    floodFill(erode5, Point(erode5.rows / 2, erode5.cols / 2), 150);
+    floodFill(erode1, Black1, 150);
+    floodFill(erode2, Black2, 150);
+    floodFill(erode3, Black3, 150);
+    floodFill(erode4, Black4, 150);
+    floodFill(erode5, Black5, 150);
+
   }
-  catch( Exception )
-  {
-    return 2;
+  catch( Exception ){
+    return -2;
   }
 
-  imshow("Ero1", erode1);
+  Mat threshold1 = thresholding( erode1 );
+  Mat threshold2 = thresholding( erode2 );
+  Mat threshold3 = thresholding( erode3 );
+  Mat threshold4 = thresholding( erode4 );
+  Mat threshold5 = thresholding( erode5 );
+
+  try{
+    floodFill(threshold1, Point(0,0), 150);
+    floodFill(threshold2, Point(0,0), 150);
+    floodFill(threshold3, Point(0,0), 150);
+    floodFill(threshold4, Point(0,0), 150);
+    floodFill(threshold5, Point(0,0), 150);
+  }
+  catch( Exception ){
+    return -2;
+  }
+
+  Mat drawCircle1 = centerFinding( threshold1, 1);
+  Mat drawCircle2 = centerFinding( threshold2, 2 );
+  Mat drawCircle3 = centerFinding( threshold3, 1 );
+  Mat drawCircle4 = centerFinding( threshold4, 2 );
+  Mat drawCircle5 = centerFinding( threshold5, 1 );
+
+  imshow("Foto1", dial1);
+  moveWindow("Foto1", 500, 0);
   waitKey(0);
-  imshow("Ero2", erode2);
+  imshow("Ero1", drawCircle1);
+  moveWindow("Ero1", 800, 0);
   waitKey(0);
-  imshow("Ero3", erode3);
+
+  imshow("Foto2", dial2);
+  moveWindow("Foto2", 500, 200);
   waitKey(0);
-  imshow("Ero4", erode4);
+  imshow("Ero2", drawCircle2);
+  moveWindow("Ero2", 800, 200);
   waitKey(0);
-  imshow("Ero5", erode5);
+
+  imshow("Foto3", dial3);
+  moveWindow("Foto3", 500, 400);
+  waitKey(0);
+  imshow("Ero3", drawCircle3);
+  moveWindow("Ero3", 800, 400);
+  waitKey(0);
+
+  imshow("Foto4", dial4);
+  moveWindow("Foto4", 500, 600);
+  waitKey(0);
+  imshow("Ero4", drawCircle4);
+  moveWindow("Ero4", 800, 600);
+  waitKey(0);
+
+  imshow("Foto5", dial5);
+  moveWindow("Foto5", 500, 800);
+  waitKey(0);
+  imshow("Ero5", drawCircle5);
+  moveWindow("Ero5", 800, 800);
   waitKey(0);
   destroyAllWindows();
-  }
+  puts("----------------");
+}
 
 
 
@@ -167,4 +220,154 @@ void matcher::setInitialData(vector<KeyPoint> keypoints_obj, vector<KeyPoint> ke
   descriptors_scene = sc;
 }
 
+Point matcher::test(Mat inputImg, int x, int y){
+  while(inputImg.at<uchar>(x, y) == 255){
+    y += 1;
+  }
+  Point black(y,x);
+  return black;
+}
 
+Mat matcher::thresholding(Mat inputImg){
+  for( int i = 0; i < inputImg.rows; i++ ){
+    for( int j = 0; j < inputImg.cols; j++ ){
+      if( inputImg.at<uchar>(i, j) == 150 ){
+        inputImg.at<uchar>(i, j) = 255;
+      } else {
+        inputImg.at<uchar>(i, j) = 0;
+      }
+    }
+  }
+  return inputImg;
+}
+
+Mat matcher::centerFinding(Mat inputImg, int tipoDial){
+  int noPuntosHor = 0, noPuntosVer = 0, noPuntosHorMax = 0, noPuntosVerMax = 0;
+  int x, y;
+  double pi = 3.1415926535;
+
+  for( int i = 0; i < inputImg.rows; i++ ){
+      noPuntosHor = 0;
+    for( int j = 0; j < inputImg.cols; j++ ){
+      if(inputImg.at<uchar>(Point( j, i )) == 0){
+        noPuntosHor += 1;
+      }
+    }
+
+    if( noPuntosHor > noPuntosHorMax ){
+      noPuntosHorMax = noPuntosHor;
+      y = i;
+    }
+  }
+
+  for( int i = 0; i < inputImg.cols; i++ ){
+    noPuntosVer = 0;
+    for( int j = 0; j < inputImg.rows; j++ ){
+      if(inputImg.at<uchar>(Point( i, j )) == 0){
+        noPuntosVer += 1;
+      }
+    }
+
+    if( noPuntosVer > noPuntosVerMax ){
+      noPuntosVerMax = noPuntosVer;
+      x = i;
+    }
+  }
+
+  double euclideanDistance = 0, maxED = 0;
+  int x1 = 0, y1 = 0;
+  for( int i = 0; i < inputImg.rows; i++ ){
+    for( int j = 0; j < inputImg.cols; j++ ){
+      if( inputImg.at<uchar>( Point( j, i ) ) == 255 ){
+        euclideanDistance = sqrt( pow( ( j - x ), 2 ) + pow( ( i - y ), 2 ) );
+        if( euclideanDistance > maxED ){
+          maxED = euclideanDistance;
+          x1 = j;
+          y1 = i;
+        }
+      }
+    }
+  }
+
+  double numbers[ 6 ] = { pi / 2, 2 * pi / 5, pi / 5, - pi / 5, - 2 * pi / 5, - pi / 2 };
+  double hyp = sqrt( pow( ( x1 - x ), 2 ) + pow( ( y - y1 ), 2 ) );
+
+  double teta1 = atan( (double)( y - y1 ) / ( x1 - x ) );
+  double teta2 = asin( (double)( y - y1 ) / hyp );
+  double teta3 = acos( (double)( x1 - x ) / hyp );
+
+  int lectura = 0;
+
+  for( int i = 0; i <= 5; i ++){
+    if( teta1 <= numbers[ i ] && teta1 > numbers[ i + 1 ]){
+      if( teta1 > 0 && teta2 < 0 ){
+        lectura = i + 5;
+        continue;
+      }
+      if( teta1 < 0 && teta2 > 0){
+        lectura = i + 5;
+        continue;
+      }
+      lectura = i;
+      continue;
+    }
+  }
+
+  if( tipoDial == 2 ){
+    lectura = 9 - lectura;
+  }
+
+  printf("%d\n", lectura);
+
+  circle( inputImg, Point(x, y), 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
+  circle( inputImg, Point(x1, y1), 3, Scalar( 0, 0, 0, 0), 1, 8, 0);
+  puts("");
+  return inputImg;
+}
+
+//Mat matcher::centerFinding(Mat inputImg){
+//  int r = 0, noPuntosNegro =0, maxPuntosNegro = 0, noPuntosBlanco = 0, maxPuntosBlanco = 0;
+//  Point init, fin, center, initMax, finMax;
+//  for( int i = 0; i < inputImg.rows; i++ ){
+//    r = 0;
+//    noPuntosNegro = 0;
+//    noPuntosBlanco = 0;
+//    for( int j = 0; j < inputImg.cols; j++ ){
+//      if( inputImg.at<uchar>(Point( j, i )) == 0 && inputImg.at<uchar>(Point( j + 1, i )) == 255 && r == 0){
+//        r += 1;
+//      }
+//      if( inputImg.at<uchar>(Point( j, i )) == 255 && inputImg.at<uchar>(Point( j + 1, i )) == 0 && r == 1){
+//        r += 1;
+//        init = Point( j, i );
+//      }
+//      if( inputImg.at<uchar>(Point( j, i )) == 0 && inputImg.at<uchar>(Point( j + 1, i )) == 255 && r == 2){
+//        r += 1;
+//        fin = Point( j, i );
+//      }
+//      if( inputImg.at<uchar>(Point( j, i )) == 255 && inputImg.at<uchar>(Point( j + 1, i )) == 0 && r == 3){
+//        r += 1;
+//      }
+//      if( r == 2 ){
+//        noPuntosNegro += 1;
+//      }
+//      if( r == 1 || r == 3 ){
+//        noPuntosBlanco += 1;
+//      }
+//    }
+//    if( r == 4 ){
+//      if( noPuntosNegro < maxPuntosNegro && noPuntosBlanco < maxPuntosBlanco ){
+//        continue;
+//      }else {
+//        initMax = init;
+//        finMax = fin;
+//        maxPuntosNegro = noPuntosNegro;
+//        maxPuntosBlanco = noPuntosBlanco;
+//        center = Point(( init.x + fin.x ) / 2, ( init.y + fin.y ) / 2);
+//      }
+//    }
+//  }
+//  circle( inputImg, initMax, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
+//  circle( inputImg, finMax, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
+//  circle( inputImg, center, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
+//  return inputImg;
+//}

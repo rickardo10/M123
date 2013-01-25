@@ -14,6 +14,9 @@ public:
 
 	int match( const string matcher_tool, const string objeto, const string escena, float desv );
 	void setInitialData( vector<KeyPoint> keypoints_obj, vector<KeyPoint> keypoints_sce, Mat ob, Mat sc );
+	Point test(Mat inputImg, int x, int y);
+	Mat thresholding(Mat inputImg);
+	Mat centerFinding(Mat inputImg, int tipoDial);
 
 private:
 
