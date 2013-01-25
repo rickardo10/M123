@@ -289,7 +289,7 @@ Mat matcher::centerFinding(Mat inputImg, int tipoDial){
     }
   }
 
-  double numbers[ 6 ] = { pi / 2, 2 * pi / 5, pi / 5, - pi / 5, - 2 * pi / 5, - pi / 2 };
+  double numbers[ 6 ] = { pi / 2, 3 * pi / 10, pi / 10, - pi / 10, - 3 * pi / 10, - pi / 2 };
   double hyp = sqrt( pow( ( x1 - x ), 2 ) + pow( ( y - y1 ), 2 ) );
 
   double teta1 = atan( (double)( y - y1 ) / ( x1 - x ) );
@@ -317,11 +317,10 @@ Mat matcher::centerFinding(Mat inputImg, int tipoDial){
     lectura = 9 - lectura;
   }
 
-  printf("%d\n", lectura);
+  printf("[Lectura Dial] = %d\n", lectura);
 
   circle( inputImg, Point(x, y), 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
   circle( inputImg, Point(x1, y1), 3, Scalar( 0, 0, 0, 0), 1, 8, 0);
-  puts("");
   return inputImg;
 }
 
