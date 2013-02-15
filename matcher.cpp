@@ -143,7 +143,6 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
     floodFill(erode3, Black3, 150);
     floodFill(erode4, Black4, 150);
     floodFill(erode5, Black5, 150);
-
   }
   catch( Exception ){
     return -2;
@@ -155,21 +154,15 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   Mat threshold4 = thresholding( erode4 );
   Mat threshold5 = thresholding( erode5 );
 
-  try{
-    floodFill(threshold1, Point(0,0), 150);
-    floodFill(threshold2, Point(0,0), 150);
-    floodFill(threshold3, Point(0,0), 150);
-    floodFill(threshold4, Point(0,0), 150);
-    floodFill(threshold5, Point(0,0), 150);
-  }
-  catch( Exception ){
-    return -2;
-  }
-
+  printf("[Dial 1]: ");
   Mat drawCircle1 = centerFinding( threshold1, 1);
+  printf("[Dial 2]: ");
   Mat drawCircle2 = centerFinding( threshold2, 2 );
+  printf("[Dial 3]: ");
   Mat drawCircle3 = centerFinding( threshold3, 1 );
+  printf("[Dial 4]: ");
   Mat drawCircle4 = centerFinding( threshold4, 2 );
+  printf("[Dial 5]: ");
   Mat drawCircle5 = centerFinding( threshold5, 1 );
 
   imshow("Foto1", dial1);
@@ -207,7 +200,7 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   moveWindow("Ero5", 800, 800);
   waitKey(0);
   destroyAllWindows();
-  puts("----------------");
+  puts("");
 }
 
 
@@ -243,36 +236,13 @@ Mat matcher::thresholding(Mat inputImg){
 
 Mat matcher::centerFinding(Mat inputImg, int tipoDial){
   int noPuntosHor = 0, noPuntosVer = 0, noPuntosHorMax = 0, noPuntosVerMax = 0;
-  int x, y;
+  double x, y;
   double pi = 3.1415926535;
 
-  for( int i = 0; i < inputImg.rows; i++ ){
-      noPuntosHor = 0;
-    for( int j = 0; j < inputImg.cols; j++ ){
-      if(inputImg.at<uchar>(Point( j, i )) == 0){
-        noPuntosHor += 1;
-      }
-    }
+  Moments momentos1 =  moments( inputImg, true );
 
-    if( noPuntosHor > noPuntosHorMax ){
-      noPuntosHorMax = noPuntosHor;
-      y = i;
-    }
-  }
-
-  for( int i = 0; i < inputImg.cols; i++ ){
-    noPuntosVer = 0;
-    for( int j = 0; j < inputImg.rows; j++ ){
-      if(inputImg.at<uchar>(Point( i, j )) == 0){
-        noPuntosVer += 1;
-      }
-    }
-
-    if( noPuntosVer > noPuntosVerMax ){
-      noPuntosVerMax = noPuntosVer;
-      x = i;
-    }
-  }
+  x = momentos1.m10 / momentos1.m00;
+  y = momentos1.m01 / momentos1.m00;
 
   double euclideanDistance = 0, maxED = 0;
   int x1 = 0, y1 = 0;
@@ -317,56 +287,10 @@ Mat matcher::centerFinding(Mat inputImg, int tipoDial){
     lectura = 9 - lectura;
   }
 
-  printf("[Lectura Dial] = %d\n", lectura);
+  printf("%d \n", lectura);
 
   circle( inputImg, Point(x, y), 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
   circle( inputImg, Point(x1, y1), 3, Scalar( 0, 0, 0, 0), 1, 8, 0);
   return inputImg;
 }
 
-//Mat matcher::centerFinding(Mat inputImg){
-//  int r = 0, noPuntosNegro =0, maxPuntosNegro = 0, noPuntosBlanco = 0, maxPuntosBlanco = 0;
-//  Point init, fin, center, initMax, finMax;
-//  for( int i = 0; i < inputImg.rows; i++ ){
-//    r = 0;
-//    noPuntosNegro = 0;
-//    noPuntosBlanco = 0;
-//    for( int j = 0; j < inputImg.cols; j++ ){
-//      if( inputImg.at<uchar>(Point( j, i )) == 0 && inputImg.at<uchar>(Point( j + 1, i )) == 255 && r == 0){
-//        r += 1;
-//      }
-//      if( inputImg.at<uchar>(Point( j, i )) == 255 && inputImg.at<uchar>(Point( j + 1, i )) == 0 && r == 1){
-//        r += 1;
-//        init = Point( j, i );
-//      }
-//      if( inputImg.at<uchar>(Point( j, i )) == 0 && inputImg.at<uchar>(Point( j + 1, i )) == 255 && r == 2){
-//        r += 1;
-//        fin = Point( j, i );
-//      }
-//      if( inputImg.at<uchar>(Point( j, i )) == 255 && inputImg.at<uchar>(Point( j + 1, i )) == 0 && r == 3){
-//        r += 1;
-//      }
-//      if( r == 2 ){
-//        noPuntosNegro += 1;
-//      }
-//      if( r == 1 || r == 3 ){
-//        noPuntosBlanco += 1;
-//      }
-//    }
-//    if( r == 4 ){
-//      if( noPuntosNegro < maxPuntosNegro && noPuntosBlanco < maxPuntosBlanco ){
-//        continue;
-//      }else {
-//        initMax = init;
-//        finMax = fin;
-//        maxPuntosNegro = noPuntosNegro;
-//        maxPuntosBlanco = noPuntosBlanco;
-//        center = Point(( init.x + fin.x ) / 2, ( init.y + fin.y ) / 2);
-//      }
-//    }
-//  }
-//  circle( inputImg, initMax, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
-//  circle( inputImg, finMax, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
-//  circle( inputImg, center, 3, Scalar( 150, 150, 150, 150), 1, 8, 0);
-//  return inputImg;
-//}

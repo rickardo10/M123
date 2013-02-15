@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   cout << endl << "Escriba un valor para la desviación:\n? ";
   cin >> desv;
 
-  for( int i = 0; i <= 160; i++ ){
+  for( int i = 1; i <= 160; i++ ){
     //--Obtención de descriptores del objeto
     if(i == 111){
       continue;
@@ -86,13 +86,11 @@ int main(int argc, char *argv[])
     //--Detección de similitudes
     matcher match1;
     match1.setInitialData( object.getKeypoints(), scene.getKeypoints(), object.getDescriptors(), scene.getDescriptors());
-
-    printf("Imagen %d: \n", i );
-
+    printf("[Medidor %d] \n", i );
     int result = match1.match(mtch, obj, scn, desv);
 
     if( result == -1 ){
-      printf("[%3d] Can't read the image\n", i);
+      printf("[%3d] Can't read the image\n\n", i);
       continue;
     }
 
@@ -100,7 +98,6 @@ int main(int argc, char *argv[])
       printf("[%3d] Bad Segmentation, try again!\n\n", i);
       continue;
     }
-
-    printf("\n\n");
   }
 }
+
