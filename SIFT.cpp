@@ -86,6 +86,9 @@ int main(int argc, char *argv[])
     //--Detección de similitudes
     matcher match1;
     match1.setInitialData( object.getKeypoints(), scene.getKeypoints(), object.getDescriptors(), scene.getDescriptors());
+
+    printf("Imagen %d: \n", i );
+
     int result = match1.match(mtch, obj, scn, desv);
 
     if( result == -1 ){
@@ -94,8 +97,10 @@ int main(int argc, char *argv[])
     }
 
     if( result == -2 ){
-      printf("[%3d] Bad Segmentation, try again!\n", i);
+      printf("[%3d] Bad Segmentation, try again!\n\n", i);
       continue;
     }
+
+    printf("\n\n");
   }
 }
