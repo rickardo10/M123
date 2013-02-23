@@ -165,6 +165,7 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   printf("[Dial 5]: ");
   Mat drawCircle5 = centerFinding( threshold5, 1 );
 
+
   imshow("Foto1", dial1);
   moveWindow("Foto1", 500, 0);
   waitKey(0);
@@ -201,6 +202,7 @@ int matcher::match(const string matcher_tool, const string objeto, const string 
   waitKey(0);
   destroyAllWindows();
   puts("");
+
 }
 
 
