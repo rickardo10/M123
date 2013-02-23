@@ -15,7 +15,6 @@ and the object and find matches.
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "descriptors.h"
-#include "matcher.h"
 
 using namespace std;
 using namespace cv;
@@ -30,74 +29,38 @@ int main(int argc, char *argv[])
   int si;
   string extension= ".jpg";
 
-//  //--Iniciación de valores iniciales
-//  printf("Escriba el nombre de la escena:\n? ");
-//  cin >> scn;
-//  printf("\nEscriba el método de Feature Detector:\nHINT: Algunos métodos son FAST, SIFT, SURF, ORB, MSER, GFTT,\nHARRIS, Dense, SimpleBlob\n? ");
-//  cin >> ftd;
-//  printf("\nEscriba el método de Descritor Extractor:\nHINT: Algunos métodos son SIFT, SURF, ORB, BRIEF, FREAK\n? ");
-//  cin >> desc;
-//  printf("\nEscriba el método de Match\nHINT:Algunos métodos son BruteForce, BruteForce-L1, BruteForce-Hamming,\nBruteForce-Hamming(2), FlannBased\n? ");
-//  cin >> mtch;
-  ftd = "HARRIS";
-  desc = "BRIEF";
-  mtch = "BruteForce-Hamming";
+  ftd = "SIFT";
+  desc = "SIFT";
+  mtch = "BruteForce";
 
-  float desv;
-  cout << endl << "Escriba un valor para la desviación:\n? ";
-  cin >> desv;
-
-  for( int i = 1; i <= 160; i++ ){
-    //--Obtención de descriptores del objeto
-    if(i == 111){
-      continue;
-    }
-
+  for( int i = 0; i <= 160; i++ ){
+    //--Concatenates file's names
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
 
+    //--Prints image number
+    printf("[Image %d] ", i );
+
+    //--Creates and initialize a meter
     descriptors object;
-    object.setImage(obj);
-    object.featureDetector(ftd);
 
-  //  cout << "Desea ver la imagen con los puntos clave?\n1. Sí\n2. No\n? ";
-  //  cin >> si;
-  //
-  //  if( si == 1 ){
-  //    object.writeKeypoints();
-  //  }
-    object.findDescriptors(desc);
+    //--Reads object and scene image's name
+    object.setImageObject( obj );
+    object.setImageScene( scn );
 
-    //--Obtención de descriptores de la escena
-    descriptors scene;
-    scene.setImage(scn);
-    scene.featureDetector(ftd);
+    //--Reads feature detector tool
+    object.setFeatureDetector( ftd );
 
-  //  cout << "Desea ver la imagen con los puntos clave?\n1. Sí\n2. No\n? ";
-  //  cin >> si;
-  //
-  //  if( si == 1 ){
-  //    scene.writeKeypoints();
-  //  }
+    //--Reads find descriptor tool
+    object.setFindDescriptors( desc );
 
-    scene.findDescriptors(desc);
+    //--Reads matcher tool
+    object.setMatcher( mtch );
 
-    //--Detección de similitudes
-    matcher match1;
-    match1.setInitialData( object.getKeypoints(), scene.getKeypoints(), object.getDescriptors(), scene.getDescriptors());
-    printf("[Medidor %d] \n", i );
-    int result = match1.match(mtch, obj, scn, desv);
-
-    if( result == -1 ){
-      printf("[%3d] Can't read the image\n\n", i);
-      continue;
-    }
-
-    if( result == -2 ){
-      printf("[%3d] Bad Segmentation, try again!\n\n", i);
-      continue;
-    }
+    //--Process available data in order to returns dials
+    object.featureDetector();
+    puts("");
   }
 }
 
