@@ -23,7 +23,7 @@ public:
   void setMatcher( const string matcherN );
 	void writeKeypoints( void );
 	void processData( void );
-	bool getSegmentation( void );
+	bool getFailure( void );
 	vector<KeyPoint> getKeypoints( void );
   bool checkSegmentation( void );
   void cropDials( void );
@@ -46,7 +46,7 @@ private:
    string name_feature;
    string name_descriptor;
    string name_matcher;
-   bool segmentation;
+   bool failure;
    vector<KeyPoint> keypoints_object;
    vector<KeyPoint> keypoints_scene;
    vector<DMatch> matches;

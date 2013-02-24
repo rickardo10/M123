@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   string scn;
   string extension= ".jpg";
 
-  for( int i = 8; i <= 160; i++ ){
+  for( int i = 0; i <= 160; i++ ){
     //--Concatenates file's names
     stringstream sstm;
     sstm << i << extension;
@@ -37,8 +37,14 @@ int main(int argc, char *argv[])
 
     //--Creates and initialize a meter
     meter test( scn );
+
+    if( test.getFailure() )
+    {
+      puts("");
+      continue;
+    }
+
     dial init( test, 2 );
-    init.test();
 
     puts("");
   }
