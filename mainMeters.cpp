@@ -38,11 +38,13 @@ int main(int argc, char *argv[])
     //--Creates and initialize a meter
     meter test( scn );
 
+    //--Checks if there is any failure and continues if so
     if( test.getFailure() )
     {
       puts("");
       continue;
     }
+
 
     dial init( test, 2 );
 

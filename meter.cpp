@@ -197,61 +197,6 @@ Mat meter::showSegmentation( void ){
   return result;
 }
 
-/*int matcher::match(const string matcher_tool, const string objeto, const string escena, float desv)
-{
-
-
-  printf("[Dial 1]: ");
-  Mat drawCircle1 = centerFinding( threshold1, 1);
-  printf("[Dial 2]: ");
-  Mat drawCircle2 = centerFinding( threshold2, 2 );
-  printf("[Dial 3]: ");
-  Mat drawCircle3 = centerFinding( threshold3, 1 );
-  printf("[Dial 4]: ");
-  Mat drawCircle4 = centerFinding( threshold4, 2 );
-  printf("[Dial 5]: ");
-  Mat drawCircle5 = centerFinding( threshold5, 1 );
-
-
-  imshow("Foto1", dial1);
-  moveWindow("Foto1", 500, 0);
-  waitKey(0);
-  imshow("Ero1", drawCircle1);
-  moveWindow("Ero1", 800, 0);
-  waitKey(0);
-
-  imshow("Foto2", dial2);
-  moveWindow("Foto2", 500, 200);
-  waitKey(0);
-  imshow("Ero2", drawCircle2);
-  moveWindow("Ero2", 800, 200);
-  waitKey(0);
-
-  imshow("Foto3", dial3);
-  moveWindow("Foto3", 500, 400);
-  waitKey(0);
-  imshow("Ero3", drawCircle3);
-  moveWindow("Ero3", 800, 400);
-  waitKey(0);
-
-  imshow("Foto4", dial4);
-  moveWindow("Foto4", 500, 600);
-  waitKey(0);
-  imshow("Ero4", drawCircle4);
-  moveWindow("Ero4", 800, 600);
-  waitKey(0);
-
-  imshow("Foto5", dial5);
-  moveWindow("Foto5", 500, 800);
-  waitKey(0);
-  imshow("Ero5", drawCircle5);
-  moveWindow("Ero5", 800, 800);
-  waitKey(0);
-  destroyAllWindows();
-  puts("");
-
-}*/
-
 ///--Checks if segmentation is good
 bool meter::checkSegmentation( void )
 {
@@ -286,22 +231,22 @@ bool meter::checkSegmentation( void )
 }
 
 
-/*void descriptors::writeKeypoints( void )
+///--Shows keypoints
+void meter::showKeypoints( void )
 {
   Scalar keypointColor1 = Scalar(0, 0, 255);// Green keypoints.
 
-  drawKeypoints( img_source, keypoints_source, output_source, keypointColor1, DrawMatchesFlags::DEFAULT);
-
-  namedWindow("Output1");
-
+  Mat output;
+  Mat result;
+  drawKeypoints( img_scene, keypoints_scene, output, keypointColor1, DrawMatchesFlags::DEFAULT);
   Size_<int> dsize = Size( round( output_source.cols / 2 ) , round( output_source.rows / 2 ) );
-  resize( output_source, result, dsize );
+  resize( output, result, dsize );
 
-  imshow("Output1", result);
+  imshow("Keypoints", result);
   char c = ' ';
   while ((c = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
-  destroyWindow("Output1");
-}*/
+  destroyWindow("Keypoints");
+}
 
 
 

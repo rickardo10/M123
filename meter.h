@@ -21,15 +21,11 @@ public:
 	void setFeatureDetector( const string name_featureD );
   void setFindDescriptors( const string name_Fdescriptor );
   void setMatcher( const string matcherN );
-	void writeKeypoints( void );
+	void showKeypoints( void );
 	void processData( void );
 	bool getFailure( void );
-	vector<KeyPoint> getKeypoints( void );
   bool checkSegmentation( void );
   void cropDials( void );
-	Point test(Mat inputImg, int x, int y);
-	Mat thresholding(Mat inputImg);
-	Mat centerFinding(Mat inputImg, int tipoDial);
 	Mat showSegmentation( void );
 	vector<Mat> getDials( void );
 

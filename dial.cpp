@@ -76,12 +76,8 @@ void dial::dialProcessing( void )
   //--Binarizes image
   Mat img_bin = binarization( img_ero );
 
-  //--Finds dial center
-  Mat img_ctr = dialReading( img_ero, 3 );
-
-
-  imshow( "look", img_ctr);
-  waitKey(0);
+  //--Reads dial
+  dialReading( img_ero, 3 );
 }
 
 ///--Seeks dial place
