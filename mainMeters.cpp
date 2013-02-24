@@ -15,6 +15,7 @@ and the object and find matches.
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "meter.h"
+#include "dial.h"
 
 using namespace std;
 using namespace cv;
@@ -25,7 +26,7 @@ int main(int argc, char *argv[])
   string scn;
   string extension= ".jpg";
 
-  for( int i = 0; i <= 160; i++ ){
+  for( int i = 8; i <= 160; i++ ){
     //--Concatenates file's names
     stringstream sstm;
     sstm << i << extension;
@@ -36,6 +37,9 @@ int main(int argc, char *argv[])
 
     //--Creates and initialize a meter
     meter test( scn );
+    dial init( test, 2 );
+    init.test();
+
     puts("");
   }
 }

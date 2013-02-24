@@ -27,7 +27,8 @@ void meter::setObject( string sceneName, string featureDetName, string findDescr
   setFeatureDetector( featureDetName );
   setFindDescriptors( findDescriptorsName );
   setMatcher( matcherName );
-  featureDetector();
+  processData();
+  cropDials();
 }
 
 ///--Reads object
@@ -64,7 +65,7 @@ void meter::setMatcher( const string matcherN )
 }
 
 ///--Process available data in order to returns dials
-void meter::featureDetector( void )
+void meter::processData( void )
 {
   //--Checks if the object exists
   if( img_object.empty() ){
@@ -147,8 +148,6 @@ void meter::featureDetector( void )
 ///--Crops dials
 void meter::cropDials( void )
 {
-  vector<Mat> dials;
-
   int xInit = round(scene_corner[0].x);
   int xFin = round(scene_corner[2].x);
   int yInit = round(scene_corner[0].y);
@@ -427,6 +426,12 @@ Mat matcher::thresholding(Mat inputImg){
 bool meter::getSegmentation()
 {
   return segmentation;
+}
+
+///-Returns vector dials
+vector<Mat> meter::getDials( void )
+{
+  return dials;
 }
 
 

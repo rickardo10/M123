@@ -22,7 +22,7 @@ public:
   void setFindDescriptors( const string name_Fdescriptor );
   void setMatcher( const string matcherN );
 	void writeKeypoints( void );
-	void featureDetector( void );
+	void processData( void );
 	bool getSegmentation( void );
 	vector<KeyPoint> getKeypoints( void );
   bool checkSegmentation( void );
@@ -31,6 +31,7 @@ public:
 	Mat thresholding(Mat inputImg);
 	Mat centerFinding(Mat inputImg, int tipoDial);
 	Mat showSegmentation( void );
+	vector<Mat> getDials( void );
 
 
 private:
@@ -54,6 +55,7 @@ private:
    vector<Point2f> scene;
    vector<Point2f> object_corner;
    vector<Point2f> scene_corner;
+   vector<Mat> dials;
 };
 
 #endif
