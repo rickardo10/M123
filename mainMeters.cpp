@@ -45,19 +45,17 @@ int main(int argc, char *argv[])
       continue;
     }
 
-    Meter.showSegmentation();
-
-    /*
     //--Creates a vector with the 5 dials
     vector<dial> dials;
 
+    printf("Reading: ");
     for( int i = 0; i < 5; i++ ){
       dial Dial( Meter, i );
       dials.push_back( Dial );
+      printf("%d ", Dial.getReading() );
     }
-    */
-
     puts("");
+    Meter.showSegmentation();
   }
 }
 

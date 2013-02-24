@@ -191,7 +191,7 @@ void dial::dialReading( Mat inputImg ){
 ///--Returns true if dialNumber is even
 bool dial::evenDialType( void )
 {
-  if( dialNumber == 2 || dialNumber == 4 ) {
+  if( dialNumber == 1 || dialNumber == 3 ) {
     return true;
   }
   else {

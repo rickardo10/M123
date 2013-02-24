@@ -30,7 +30,7 @@ void meter::setObject( string sceneName, string featureDetName, string findDescr
   processData();
 
   if( !failure ){
-    //cropDials();
+    cropDials();
   }
 }
 
