@@ -42,6 +42,7 @@ void descriptors::setImageScene( const string name_scene )
 {
   //--Reads image
 	img_scene = imread( name_scene, 0);
+	img_sceneColor = imread( name_scene);
 }
 
 ///--Reads feature detector
@@ -135,23 +136,6 @@ void descriptors::featureDetector( void )
   //--Moves scene corners to fit dials
   perspectiveTransform(object_corner, scene_corner, H);
 
-  //-- Draw lines between the corners (the mapped object in the scene - image_2 )
-  line( img_scene, scene_corner[0], scene_corner[1], Scalar( 0, 255, 0, 255), 2 );
-  line( img_scene, scene_corner[1], scene_corner[2], Scalar( 0, 255, 0, 255), 2 );
-  line( img_scene, scene_corner[2], scene_corner[3], Scalar( 0, 255, 0, 255), 2 );
-  line( img_scene, scene_corner[3], scene_corner[0], Scalar( 0, 255, 0, 255), 2 );
-
-  //-- Resize image
-  Size_<int> dsize = Size( round( img_scene.cols / 2 ) , round( img_scene.rows / 2 ) );
-  resize( img_scene, result, dsize );
-  imshow( "Good Matches", result );
-  moveWindow("Good Matches", 500, 0 );
-
-  char s = ' ';
-  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
-
-  destroyWindow("Good Matches");
-
   //--Checks if segmentation is good
   segmentation = checkSegmentation();
   if( !segmentation ){
@@ -159,8 +143,7 @@ void descriptors::featureDetector( void )
     return;
   }
 
-  //Crops each dial
-  cropDials();
+  showSegmentation();
 }
 
 ///--Crops dials
@@ -179,6 +162,32 @@ void descriptors::cropDials( void )
 
   imshow("Intento", dial1);
   waitKey(0);
+}
+
+///--Shows a meter image with lines surroundig dials
+Mat descriptors::showSegmentation( void ){
+
+  //--Creates a new color image
+  Mat img_seg( img_sceneColor );
+
+  //--Draw lines between the corners (the mapped object in the scene - image_2 )
+  line( img_seg, scene_corner[0], scene_corner[1], Scalar( 0, 255, 0, 255), 2 );
+  line( img_seg, scene_corner[1], scene_corner[2], Scalar( 0, 255, 0, 255), 2 );
+  line( img_seg, scene_corner[2], scene_corner[3], Scalar( 0, 255, 0, 255), 2 );
+  line( img_seg, scene_corner[3], scene_corner[0], Scalar( 0, 255, 0, 255), 2 );
+
+  //--Resize image
+  Mat result;
+  Size_<int> dsize = Size( round( img_seg.cols / 2 ) , round( img_seg.rows / 2 ) );
+  resize( img_seg, result, dsize );
+  imshow( "Good Matches", result );
+  moveWindow("Good Matches", 500, 0 );
+
+  char s = ' ';
+  while ((s = waitKey(0)) != 'q');  // Keep window there until user presses 'q' to quit.
+
+  destroyAllWindows();
+  return result;
 }
 
 /*int matcher::match(const string matcher_tool, const string objeto, const string escena, float desv)
@@ -416,6 +425,12 @@ Mat matcher::thresholding(Mat inputImg){
   circle( inputImg, Point(x1, y1), 3, Scalar( 0, 0, 0, 0), 1, 8, 0);
   return inputImg;
 }*/
+
+///--Returns variable segmentation
+bool descriptors::getSegmentation()
+{
+  return segmentation;
+}
 
 
 

@@ -23,22 +23,22 @@ public:
   void setMatcher( const string matcherN );
 	void writeKeypoints( void );
 	void featureDetector( void );
-	void findDescriptors( const string descriptor_tool );
-	Mat getDescriptors( void );
+	bool getSegmentation( void );
 	vector<KeyPoint> getKeypoints( void );
   bool checkSegmentation( void );
   void cropDials( void );
 	Point test(Mat inputImg, int x, int y);
 	Mat thresholding(Mat inputImg);
 	Mat centerFinding(Mat inputImg, int tipoDial);
+	Mat showSegmentation( void );
 
 
 private:
 
    Mat img_object;
    Mat img_scene;
+   Mat img_sceneColor;
    Mat img_matches;
-   Mat result;
    Mat descriptors_object;
    Mat descriptors_scene;
    Mat H;
