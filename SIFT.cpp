@@ -23,15 +23,7 @@ int main(int argc, char *argv[])
 {
   const string obj = "diales.jpg";
   string scn;
-  string ftd;
-  string desc;
-  string mtch;
-  int si;
   string extension= ".jpg";
-
-  ftd = "SIFT";
-  desc = "SIFT";
-  mtch = "BruteForce";
 
   for( int i = 0; i <= 160; i++ ){
     //--Concatenates file's names
@@ -43,23 +35,7 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    descriptors object;
-
-    //--Reads object and scene image's name
-    object.setImageObject( obj );
-    object.setImageScene( scn );
-
-    //--Reads feature detector tool
-    object.setFeatureDetector( ftd );
-
-    //--Reads find descriptor tool
-    object.setFindDescriptors( desc );
-
-    //--Reads matcher tool
-    object.setMatcher( mtch );
-
-    //--Process available data in order to returns dials
-    object.featureDetector();
+    descriptors test( scn );
     puts("");
   }
 }

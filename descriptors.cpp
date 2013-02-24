@@ -11,6 +11,25 @@
 using namespace std;
 using namespace cv;
 
+///--Constructor function to initialize private data
+descriptors::descriptors( string img_scene, string name_feature, string name_descriptor,
+                          string name_matcher, string img_object )
+{
+  setObject( img_scene, name_feature, name_descriptor, name_matcher, img_object );
+}
+
+///--Set object, feature, descriptor, matcher and scene
+void descriptors::setObject( string sceneName, string featureDetName, string findDescriptorsName,
+          string matcherName, string objectName )
+{
+  setImageObject( objectName );
+  setImageScene( sceneName );
+  setFeatureDetector( featureDetName );
+  setFindDescriptors( findDescriptorsName );
+  setMatcher( matcherName );
+  featureDetector();
+}
+
 ///--Reads object
 void descriptors::setImageObject( const string name_object )
 {
