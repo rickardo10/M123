@@ -30,7 +30,7 @@ void meter::setObject( string sceneName, string featureDetName, string findDescr
   processData();
 
   if( !failure ){
-    cropDials();
+    //cropDials();
   }
 }
 
@@ -158,17 +158,17 @@ void meter::cropDials( void )
   int yInit = round(scene_corner[0].y);
   int yFin = round(scene_corner[2].y);
 
-  dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-  dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-  dials.push_back( img_scene( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-  dials.push_back( img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-  dials.push_back( img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+    dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+    dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+    dials.push_back( img_scene( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+    dials.push_back( img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+    dials.push_back( img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
 
-  dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-  dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-  dials.push_back( img_sceneColor( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-  dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-  dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
 }
 
 ///--Shows a meter image with lines surroundig dials
@@ -203,6 +203,7 @@ void meter::checkSegmentation( void )
   //--Checks if there is a segmentation
   if( ( scene_corner[2].x - scene_corner[3].x ) == 0  ){
     failure = true;
+    printf( "No Rectangle " );
     return;
   }
 
@@ -210,6 +211,7 @@ void meter::checkSegmentation( void )
   if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.9 ||
         ((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) > 1.1){
     failure = true;
+    printf("Weird Rectangle Form ");
     return;
   }
 
@@ -217,18 +219,21 @@ void meter::checkSegmentation( void )
   if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.9 ||
         ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1){
     failure = true;
+    printf("Weird Rectangle Form ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[1].x > img_scene.cols || scene_corner[0].x < 0 || scene_corner[3].x < 0){
     failure = true;
+    printf("Out of Limits ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[3].y > img_scene.rows || scene_corner[0].y < 0 || scene_corner[1].y < 0){
     failure = true;
+    printf("Out of Limits ");
     return;
   }
 

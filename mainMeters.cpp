@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
       continue;
     }
 
+    Meter.showSegmentation();
+
+    /*
     //--Creates a vector with the 5 dials
     vector<dial> dials;
 
@@ -52,6 +55,7 @@ int main(int argc, char *argv[])
       dial Dial( Meter, i );
       dials.push_back( Dial );
     }
+    */
 
     puts("");
   }
