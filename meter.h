@@ -24,7 +24,7 @@ public:
 	void showKeypoints( void );
 	void processData( void );
 	bool getFailure( void );
-  bool checkSegmentation( void );
+  void checkSegmentation( void );
   void cropDials( void );
 	Mat showSegmentation( void );
 	vector<Mat> getDials( void );

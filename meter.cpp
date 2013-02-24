@@ -143,7 +143,7 @@ void meter::processData( void )
   perspectiveTransform(object_corner, scene_corner, H);
 
   //--Checks if segmentation is good
-  failure = checkSegmentation();
+  checkSegmentation();
   if( failure ){
     printf("Failure: bad segmentation");
     return;
@@ -198,36 +198,41 @@ Mat meter::showSegmentation( void ){
 }
 
 ///--Checks if segmentation is good
-bool meter::checkSegmentation( void )
+void meter::checkSegmentation( void )
 {
   //--Checks if there is a segmentation
   if( ( scene_corner[2].x - scene_corner[3].x ) == 0  ){
-    return true;
+    failure = true;
+    return;
   }
 
   //--Checks if the segmentation form is a rectangle
   if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.9 ||
         ((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) > 1.1){
-    return true;
+    failure = true;
+    return;
   }
 
   //--Checks if the segmentation form is a rectangle
   if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.9 ||
         ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1){
-    return true;
+    failure = true;
+    return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[1].x > img_scene.cols || scene_corner[0].x < 0 || scene_corner[3].x < 0){
-    return true;
+    failure = true;
+    return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[3].y > img_scene.rows || scene_corner[0].y < 0 || scene_corner[1].y < 0){
-    return true;
+    failure = true;
+    return;
   }
 
-  return false;
+  failure = false;
 }
 
 
@@ -239,7 +244,7 @@ void meter::showKeypoints( void )
   Mat output;
   Mat result;
   drawKeypoints( img_scene, keypoints_scene, output, keypointColor1, DrawMatchesFlags::DEFAULT);
-  Size_<int> dsize = Size( round( output_source.cols / 2 ) , round( output_source.rows / 2 ) );
+  Size_<int> dsize = Size( round( output.cols / 2 ) , round( output.rows / 2 ) );
   resize( output, result, dsize );
 
   imshow("Keypoints", result);
@@ -250,7 +255,7 @@ void meter::showKeypoints( void )
 
 
 
-///--Returns variable segmentation
+///--Returns variable failure
 bool meter::getFailure()
 {
   return failure;

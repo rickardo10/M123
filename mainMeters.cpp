@@ -36,17 +36,22 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter test( scn );
+    meter Meter( scn );
 
     //--Checks if there is any failure and continues if so
-    if( test.getFailure() )
+    if( Meter.getFailure() )
     {
       puts("");
       continue;
     }
 
+    //--Creates a vector with the 5 dials
+    vector<dial> dials;
 
-    dial init( test, 2 );
+    for( int i = 0; i < 5; i++ ){
+      dial Dial( Meter, i );
+      dials.push_back( Dial );
+    }
 
     puts("");
   }

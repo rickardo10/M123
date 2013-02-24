@@ -13,8 +13,8 @@ using namespace std;
 using namespace cv;
 
 ///--Constructor
-dial::dial( const meter rDial, int dialNumber )
-: Meter( rDial )
+dial::dial( const meter rMeter, int dialNumber )
+: Meter( rMeter )
 {
   setDial( Meter.getDials() );
   setDialNumber( dialNumber );
@@ -41,6 +41,12 @@ void dial::setDialImage( void )
   imageDialColor = Dial[ dialNumber + 5 ];
 }
 
+///--Gets the reading
+int dial::getReading( void )
+{
+  return reading;
+}
+
 ///--Process the image
 void dial::dialProcessing( void )
 {
@@ -65,11 +71,19 @@ void dial::dialProcessing( void )
   //--Seeks dial place
   Point Black = seekDial( img_ero, img_ero.cols / 2, img_ero.rows / 2 );
 
+  //--Checks if point is inside the image
+  checkFailure( Black, img_ero );
+  if( failure ){
+    printf("Failure: fails floodfill in dial %d ", dialNumber );
+    return;
+  }
+
   //--Filters image
   try{
     floodFill( img_ero, Black, 150);
   }
-  catch( Exception ){
+  catch( cv::Exception ){
+    printf("Failure: floodfill\n");
     return;
   }
 
@@ -77,7 +91,7 @@ void dial::dialProcessing( void )
   Mat img_bin = binarization( img_ero );
 
   //--Reads dial
-  dialReading( img_ero, 3 );
+  dialReading( img_ero );
 }
 
 ///--Seeks dial place
@@ -106,8 +120,8 @@ Mat dial::binarization( Mat inputImg ){
   return inputImg;
 }
 
-///--Finds dial center
-void dial::dialReading(Mat inputImg, int dialType){
+///--Reads dial
+void dial::dialReading( Mat inputImg ){
   double x, y;
   double pi = 3.1415926535;
 
@@ -165,7 +179,7 @@ void dial::dialReading(Mat inputImg, int dialType){
   }
 
   //--If the dial is even then it's reading is differnt
-  if( dialType == 2 ){
+  if( evenDialType() ){
     reading = 9 - reading;
   }
 
@@ -173,3 +187,38 @@ void dial::dialReading(Mat inputImg, int dialType){
   centroid = Point( x1, y1 );
   tip = Point( x, y );
 }
+
+///--Returns true if dialNumber is even
+bool dial::evenDialType( void )
+{
+  if( dialNumber == 2 || dialNumber == 4 ) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+///--Returns variable failure
+bool dial::getFailure()
+{
+  return failure;
+}
+
+///--Checks if segmentation is good
+void dial::checkFailure( Point test, Mat img_scene )
+{
+  failure = false;
+  //--Checks if points are inside the image
+  if(test.x > img_scene.cols || test.x < 0 ){
+    failure = true;
+    return;
+  }
+
+  //--Checks if points are inside the image
+  if(test.y > img_scene.rows || test.y < 0 ){
+    failure = true;
+    return;
+  }
+}
+

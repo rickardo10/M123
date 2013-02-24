@@ -19,20 +19,26 @@ public:
   void test( void );
   void setDialImage( void );
   void dialProcessing( void );
+  void checkFailure( Point test, Mat img_scene );
   Point seekDial(Mat inputImg, int x, int y);
   Mat binarization( Mat inputImg );
-  void dialReading(Mat inputImg, int dialType);
+  void dialReading( Mat inputImg );
+  bool evenDialType( void );
+  bool getFailure( void );
+  int getReading( void );
+
 
 private:
 
   meter Meter;
   vector<Mat> Dial;
   int dialNumber;
+  int reading;
   Mat imageDial;
   Mat imageDialColor;
-  int reading;
   Point centroid;
   Point tip;
+  bool failure;
 
 };
 
