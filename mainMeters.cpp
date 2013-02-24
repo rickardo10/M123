@@ -14,7 +14,7 @@ and the object and find matches.
 #include <opencv2/calib3d/calib3d.hpp>
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "descriptors.h"
+#include "meter.h"
 
 using namespace std;
 using namespace cv;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    descriptors test( scn );
+    meter test( scn );
     puts("");
   }
 }

@@ -1,18 +1,18 @@
-//descriptors.hpp
+//meter.hpp
 //printImage Class Definition
 //Member functions defined in printImage.h
 
-#ifndef DESCRIPTORS_H
-#define DESCRIPTORS_H
+#ifndef METER_H
+#define METER_H
 
 using namespace std;
 using namespace cv;
 
-class descriptors
+class meter
 {
 public:
 
-  descriptors( string = "1.jpg", string = "SIFT", string = "SIFT",
+  meter( string = "1.jpg", string = "SIFT", string = "SIFT",
                string = "BruteForce", string = "diales.jpg" );
   void setObject( string sceneName, string featureDetName, string findDescriptorsName,
           string matcherName, string objectName );

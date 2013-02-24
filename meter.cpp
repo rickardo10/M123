@@ -5,21 +5,21 @@
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include "descriptors.h"
+#include "meter.h"
 #include <iostream>
 
 using namespace std;
 using namespace cv;
 
 ///--Constructor function to initialize private data
-descriptors::descriptors( string img_scene, string name_feature, string name_descriptor,
+meter::meter( string img_scene, string name_feature, string name_descriptor,
                           string name_matcher, string img_object )
 {
   setObject( img_scene, name_feature, name_descriptor, name_matcher, img_object );
 }
 
 ///--Set object, feature, descriptor, matcher and scene
-void descriptors::setObject( string sceneName, string featureDetName, string findDescriptorsName,
+void meter::setObject( string sceneName, string featureDetName, string findDescriptorsName,
           string matcherName, string objectName )
 {
   setImageObject( objectName );
@@ -31,14 +31,14 @@ void descriptors::setObject( string sceneName, string featureDetName, string fin
 }
 
 ///--Reads object
-void descriptors::setImageObject( const string name_object )
+void meter::setImageObject( const string name_object )
 {
   //--Reads image
 	img_object = imread( name_object, 0);
 }
 
 ///--Reads Scene
-void descriptors::setImageScene( const string name_scene )
+void meter::setImageScene( const string name_scene )
 {
   //--Reads image
 	img_scene = imread( name_scene, 0);
@@ -46,25 +46,25 @@ void descriptors::setImageScene( const string name_scene )
 }
 
 ///--Reads feature detector
-void descriptors::setFeatureDetector( const string name_featureD )
+void meter::setFeatureDetector( const string name_featureD )
 {
    name_feature = name_featureD;
 }
 
 ///--Reads descriptor finder
-void descriptors::setFindDescriptors( const string name_Fdescriptor )
+void meter::setFindDescriptors( const string name_Fdescriptor )
 {
    name_descriptor = name_Fdescriptor;
 }
 
 ///--Reads matcher
-void descriptors::setMatcher( const string matcherN )
+void meter::setMatcher( const string matcherN )
 {
    name_matcher = matcherN;
 }
 
 ///--Process available data in order to returns dials
-void descriptors::featureDetector( void )
+void meter::featureDetector( void )
 {
   //--Checks if the object exists
   if( img_object.empty() ){
@@ -142,30 +142,27 @@ void descriptors::featureDetector( void )
     printf("Failure: bad segmentation");
     return;
   }
-
-  showSegmentation();
 }
 
 ///--Crops dials
-void descriptors::cropDials( void )
+void meter::cropDials( void )
 {
+  vector<Mat> dials;
+
   int xInit = round(scene_corner[0].x);
   int xFin = round(scene_corner[2].x);
   int yInit = round(scene_corner[0].y);
   int yFin = round(scene_corner[2].y);
 
-  Mat dial1 = img_scene( Range( yInit, yFin ), Range(xInit, (xFin + 4 * xInit)/5));
-  Mat dial2 = img_scene( Range( yInit, yFin ), Range((xFin + 4 * xInit)/5, (2 * xFin + 3 * xInit)/5));
-  Mat dial3 = img_scene( Range( yInit, yFin ), Range((2 * xFin + 3 * xInit)/5, (3 * xFin + 2 * xInit)/5));
-  Mat dial4 = img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, (4 * xFin + 1 * xInit)/5));
-  Mat dial5 = img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, (5 * xFin + 0 * xInit)/5));
-
-  imshow("Intento", dial1);
-  waitKey(0);
+  dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+  dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+  dials.push_back( img_scene( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+  dials.push_back( img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+  dials.push_back( img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
 }
 
 ///--Shows a meter image with lines surroundig dials
-Mat descriptors::showSegmentation( void ){
+Mat meter::showSegmentation( void ){
 
   //--Creates a new color image
   Mat img_seg( img_sceneColor );
@@ -286,7 +283,7 @@ Mat descriptors::showSegmentation( void ){
 }*/
 
 ///--Checks if segmentation is good
-bool descriptors::checkSegmentation( void )
+bool meter::checkSegmentation( void )
 {
   //--Checks if there is a segmentation
   if( ( scene_corner[2].x - scene_corner[3].x ) == 0  ){
@@ -427,7 +424,7 @@ Mat matcher::thresholding(Mat inputImg){
 }*/
 
 ///--Returns variable segmentation
-bool descriptors::getSegmentation()
+bool meter::getSegmentation()
 {
   return segmentation;
 }
