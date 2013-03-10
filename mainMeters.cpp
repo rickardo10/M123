@@ -42,6 +42,7 @@ int main(int argc, char *argv[])
     if( Meter.getFailure() )
     {
       puts("");
+      Meter.showSegmentation();
       continue;
     }
 
