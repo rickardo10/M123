@@ -1,4 +1,4 @@
-/*
+  /*
 Date: 07/01/2013
 Creator: Ricardo Antonio Ocampo Vega
 Description: Detects the keypoints of an image. After, extracts the
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     if( Meter.getFailure() )
     {
       puts("");
-      Meter.showSegmentation();
+//      Meter.showSegmentation();
       continue;
     }
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
       printf("%d ", Dial.getReading() );
     }
     puts("");
-    Meter.showSegmentation();
+//    Meter.showSegmentation();
   }
 }
 
