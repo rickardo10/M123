@@ -6,6 +6,7 @@ keypoints descriptors. Finally, compares the keypoints of the scene
 and the object and find matches.
 */
 
+#include<fstream>
 #include <stdio.h>
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -22,15 +23,37 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-  const string obj = "diales.jpg";
-  string scn;
-  string extension= ".jpg";
+   const string obj = "diales.jpg";
+   string scn;
+   string extension= ".jpg";
 
+   //--Reads real readings from a file
+   ifstream file("/home/rocampo/Medidores/M123/readings.txt");
+   int a, b, c, d, e;
+   vector<int> dialR[5];
+   while( !file.eof() )
+   {
+     file >> a >> b >> c >> d >> e;
+
+     dialR[0].push_back( a );
+     dialR[1].push_back( b );
+     dialR[2].push_back( c );
+     dialR[3].push_back( d );
+     dialR[4].push_back( e );
+  }
+
+  file.close();
+
+  //--Creates file names
   for( int i = 0; i <= 160; i++ ){
     //--Concatenates file's names
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
+
+    if( i == 150 || i == 151 ){
+      continue;
+    }
 
     //--Prints image number
     printf("[Image %d] ", i );
@@ -42,7 +65,7 @@ int main(int argc, char *argv[])
     if( Meter.getFailure() )
     {
       puts("");
-      Meter.showSegmentation();
+//      Meter.showSegmentation();
       continue;
     }
 
@@ -50,13 +73,20 @@ int main(int argc, char *argv[])
     vector<dial> dials;
 
     printf("Reading: ");
-    for( int i = 0; i < 5; i++ ){
-      dial Dial( Meter, i );
+    for( int j = 0; j < 5; j++ ){
+      dial Dial( Meter, j );
       dials.push_back( Dial );
-      printf("%d ", Dial.getReading() );
+
+      if( Dial.getReading() == dialR[j].at(i) ){
+        cout << "true" << " ";
+      }
+      else{
+        cout << "false" << " ";
+      }
+
     }
     puts("");
-    Meter.showSegmentation();
+//    Meter.showSegmentation();
   }
 }
 
