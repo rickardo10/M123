@@ -17,6 +17,7 @@ and the object and find matches.
 #include <opencv2/imgproc/imgproc.hpp>
 #include "meter.h"
 #include "dial.h"
+#include <math.h>
 
 using namespace std;
 using namespace cv;
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn );
+    meter Meter( scn, "FAST", "BRIEF", "BruteForce-Hamming" );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
@@ -99,9 +100,12 @@ int main(int argc, char *argv[])
 //    Meter.showSegmentation();
   }
 
+  printf("\n\n----------------------------------------------------------------\n\n");
   cout << "Total Meters: " << totalSegmentations << endl;
   cout << "Total Dials: " << totalDials << endl;
   cout << "Bad Segmentations: " << badSegmentations << endl;
   cout << "False Positives: " << falsePositives << endl;
+  cout <<"% False Positives: " << round( (double)falsePositives / totalDials * 100 ) << "%" << endl;
+  cout <<"% Bad Segmentations: " << round( (double)badSegmentations / totalSegmentations * 100 ) << "%" << endl;
 }
 
