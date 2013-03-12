@@ -26,6 +26,10 @@ int main(int argc, char *argv[])
    const string obj = "diales.jpg";
    string scn;
    string extension= ".jpg";
+   int totalSegmentations =0;
+   int badSegmentations = 0;
+   int falsePositives = 0;
+   int totalDials = 0;
 
    //--Reads real readings from a file
    ifstream file("/home/rocampo/Medidores/M123/readings.txt");
@@ -44,9 +48,8 @@ int main(int argc, char *argv[])
 
   file.close();
 
-  //--Creates file names
-  for( int i = 0; i <= 160; i++ ){
-    //--Concatenates file's names
+   //--Concatenates file's names
+  for( int i = 0; i <= 157; i++ ){
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
@@ -54,6 +57,9 @@ int main(int argc, char *argv[])
     if( i == 150 || i == 151 ){
       continue;
     }
+
+    //--Counts segmentations
+    totalSegmentations++;
 
     //--Prints image number
     printf("[Image %d] ", i );
@@ -66,6 +72,7 @@ int main(int argc, char *argv[])
     {
       puts("");
 //      Meter.showSegmentation();
+      badSegmentations++;
       continue;
     }
 
@@ -76,17 +83,25 @@ int main(int argc, char *argv[])
     for( int j = 0; j < 5; j++ ){
       dial Dial( Meter, j );
       dials.push_back( Dial );
+      //--Counts readings
+      totalDials++;
 
       if( Dial.getReading() == dialR[j].at(i) ){
         cout << "true" << " ";
       }
       else{
         cout << "false" << " ";
+        //--Counts false positive readings
+        falsePositives++;
       }
-
     }
     puts("");
 //    Meter.showSegmentation();
   }
+
+  cout << "Total Meters: " << totalSegmentations << endl;
+  cout << "Total Dials: " << totalDials << endl;
+  cout << "Bad Segmentations: " << badSegmentations << endl;
+  cout << "False Positives: " << falsePositives << endl;
 }
 

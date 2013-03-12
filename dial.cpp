@@ -68,7 +68,7 @@ void dial::dialProcessing( void )
 
   img_ero = filtering( img_ero );
 
-  imshow( "Filtered", img_ero );
+//  imshow( "Filtered", img_ero );
 
   Mat img_dil;
   dilate( img_ero, img_dil, element2, Point( 1, 1 ), 6 );
@@ -78,16 +78,16 @@ void dial::dialProcessing( void )
 
   img_ero2 = filtering( img_ero2 );
 
-  imshow( "Original", img_thrshld);
-  imshow( "Erosion", img_ero );
-  imshow( "Erosion2", img_ero2 );
-  imshow( "Dilate", img_dil );
-  moveWindow( "Erosion", 200, 200 );
-  moveWindow( "Original", 0, 200 );
-  moveWindow( "Dilate", 400, 200 );
-  moveWindow( "Filtered", 600, 200 );
-  moveWindow( "Erosion2", 800, 200 );
-  waitKey(0);
+//  imshow( "Original", img_thrshld);
+//  imshow( "Erosion", img_ero );
+//  imshow( "Erosion2", img_ero2 );
+//  imshow( "Dilate", img_dil );
+//  moveWindow( "Erosion", 200, 200 );
+//  moveWindow( "Original", 0, 200 );
+//  moveWindow( "Dilate", 400, 200 );
+//  moveWindow( "Filtered", 600, 200 );
+//  moveWindow( "Erosion2", 800, 200 );
+//  waitKey(0);
 
   //--Reads dial
   dialReading( img_ero2 );
@@ -191,8 +191,8 @@ void dial::dialReading( Mat inputImg ){
   circle( img_new, centroid, 3, Scalar( 0, 255, 0, 255 ), 1 );
   circle( img_new, tip, 3, Scalar( 0, 255, 0, 255 ), 1  );
 
-  imshow( "points", img_new );
-  waitKey(0);
+//  imshow( "points", img_new );
+//  waitKey(0);
 }
 
 ///--Returns true if dialNumber is even
