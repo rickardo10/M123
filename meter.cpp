@@ -110,16 +110,23 @@ void meter::processData( void )
   double max_dist = 0; double min_dist = 100;
 
   //--Finds max and min distances between descriptors
-  for(int i = 0; i < descriptors_object.rows; i++)
-  { double dist = matches[i].distance;
-    if(dist < min_dist) min_dist = dist;
-    if(dist > max_dist) max_dist = dist;
+  for( int i = 0; i < descriptors_object.rows; i++ ){ 
+    double dist = matches[i].distance;
+    if(dist < min_dist) {
+      min_dist = dist;
+    }
+    if( dist > max_dist ) {
+      max_dist = dist;
+    }
   }
-
+  
+  do{
+  float desv = 2.0;
   //--Finds good matches
-  for(int i = 0; i < descriptors_object.rows; i++)
-  { if(matches[i].distance <= 3.4 * min_dist)
-     { good_matches.push_back( matches[i]); }
+  for( int i = 0; i < descriptors_object.rows; i++){ 
+    if( matches[i].distance <= desv * min_dist ){ 
+        good_matches.push_back( matches[i] ); 
+    }
   }
 
   //--Stores good matches' points of object and scene
@@ -144,6 +151,9 @@ void meter::processData( void )
 
   //--Checks if segmentation is good
   checkSegmentation();
+  desv += 0.1;
+  }while( failure == true &&  desv < 5 );
+  
   if( failure ){
     printf("Failure: bad segmentation");
     return;
