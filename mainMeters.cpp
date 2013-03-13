@@ -18,6 +18,7 @@ and the object and find matches.
 #include "meter.h"
 #include "dial.h"
 #include <math.h>
+#include <ctime>
 
 using namespace std;
 using namespace cv;
@@ -49,13 +50,15 @@ int main(int argc, char *argv[])
 
   file.close();
 
+  clock_t Start = clock();
+
    //--Concatenates file's names
   for( int i = 0; i <= 157; i++ ){
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
 
-    if( i == 150 || i == 151 ){
+    if( i == 150 || i == 151 || i == 111 ){
       continue;
     }
 
@@ -66,7 +69,7 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn, "FAST", "BRIEF", "BruteForce-Hamming" );
+    meter Meter( scn, "HARRIS", "ORB", "BruteForce-Hamming" );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
@@ -107,5 +110,5 @@ int main(int argc, char *argv[])
   cout << "False Positives: " << falsePositives << endl;
   cout <<"% False Positives: " << round( (double)falsePositives / totalDials * 100 ) << "%" << endl;
   cout <<"% Bad Segmentations: " << round( (double)badSegmentations / totalSegmentations * 100 ) << "%" << endl;
+  cout << "Elapsed Time: " << (double)( clock() - Start ) /CLOCKS_PER_SEC << endl;
 }
-
