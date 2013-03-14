@@ -182,11 +182,10 @@ void meter::processData( void )
   Mat dst;
   warpAffine( img_scene, dst, rot_mat, img_scene.size() );
   
-  imshow  ( "Rotated", dst );
-  waitKey( 0 );
-  
   cout << "\n" << desv << endl;
 }
+
+
 
 ///--Crops dials
 void meter::cropDials( void )
