@@ -120,7 +120,7 @@ void meter::processData( void )
     }
   }
   
-  float desv = 2.5;
+  float desv = 2;
   //Seeks the best deviation
   do{
     //--Finds good matches
@@ -158,7 +158,7 @@ void meter::processData( void )
     //--Checks if segmentation is good
     checkSegmentation();
     desv += 0.1;
-  }while( failure == true &&  desv <= 5 );
+  }while( failure == true &&  desv <= 7 );
   
   //--If there is a failure prints error and returns
   if( failure ){

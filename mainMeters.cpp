@@ -23,7 +23,7 @@ and the object and find matches.
 using namespace std;
 using namespace cv;
 
-int main(int argc, char *argv[])
+int main( int argc, char *argv[] )
 {
    const string obj = "diales.jpg";
    string scn;
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     sstm << i << extension;
     scn = sstm.str();
 
-    if( i == 4 || i == 6 || i == 15 || i == 101 || i == 133 || i == 150 || i == 151 || i == 152 ){
+    if( i == 4 || i == 6 || i == 15 || i == 101 || i == 133 || i == 150 || i == 151 || i == 152 || i == 111 || i == 60 ){
       continue;
     }
 
@@ -70,13 +70,13 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn );
+    meter Meter( scn, "HARRIS", "BRIEF", "BruteForce-Hamming" );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
     {
       puts("");
-     Meter.showSegmentation();
+     //~ Meter.showSegmentation();
       badSegmentations++;
       continue;
     }
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
       }
     }
     puts("");
-    Meter.showSegmentation();
+    //~ Meter.showSegmentation();
   }
 
   printf("\n\n----------------------------------------------------------------\n\n");
