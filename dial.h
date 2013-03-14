@@ -26,6 +26,8 @@ public:
   bool evenDialType( void );
   bool getFailure( void );
   int getReading( void );
+  Mat complement( Mat inputImg );
+  Mat filtering( Mat img_orig );
 
 
 private:

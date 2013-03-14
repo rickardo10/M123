@@ -6,6 +6,7 @@ keypoints descriptors. Finally, compares the keypoints of the scene
 and the object and find matches.
 */
 
+#include<fstream>
 #include <stdio.h>
 #include <iostream>
 #include <opencv2/core/core.hpp>
@@ -16,33 +17,69 @@ and the object and find matches.
 #include <opencv2/imgproc/imgproc.hpp>
 #include "meter.h"
 #include "dial.h"
+#include <math.h>
+#include <ctime>
 
 using namespace std;
 using namespace cv;
 
 int main(int argc, char *argv[])
 {
-  const string obj = "diales.jpg";
-  string scn;
-  string extension= ".jpg";
+   const string obj = "diales.jpg";
+   string scn;
+   string extension= ".jpg";
+   int totalSegmentations =0;
+   int badSegmentations = 0;
+   int falsePositives = 0;
+   int totalDials = 0;
 
-  for( int i = 0; i <= 160; i++ ){
-    //--Concatenates file's names
+   //--Reads real readings from a file
+   ifstream file("/home/rocampo/Medidores/M123/readings.txt");
+   int a, b, c, d, e;
+   vector<int> dialR[5];
+   while( !file.eof() )
+   {
+     file >> a >> b >> c >> d >> e;
+
+     dialR[0].push_back( a );
+     dialR[1].push_back( b );
+     dialR[2].push_back( c );
+     dialR[3].push_back( d );
+     dialR[4].push_back( e );
+  }
+
+  file.close();
+
+  clock_t Start = clock();
+
+   //--Concatenates file's names
+  for( int i = 0; i <= 157; i++ ){
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
+
+    if( i == 150 || i == 151 || i == 111 ){
+      continue;
+    }
+
+    //--Counts segmentations
+    totalSegmentations++;
 
     //--Prints image number
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn );
+    meter Meter( scn, "HARRIS", "ORB", "BruteForce-Hamming" );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
     {
       puts("");
 //      Meter.showSegmentation();
+<<<<<<< HEAD
+=======
+      badSegmentations++;
+>>>>>>> newBranch
       continue;
     }
 
@@ -50,13 +87,31 @@ int main(int argc, char *argv[])
     vector<dial> dials;
 
     printf("Reading: ");
-    for( int i = 0; i < 5; i++ ){
-      dial Dial( Meter, i );
+    for( int j = 0; j < 5; j++ ){
+      dial Dial( Meter, j );
       dials.push_back( Dial );
-      printf("%d ", Dial.getReading() );
+      //--Counts readings
+      totalDials++;
+
+      if( Dial.getReading() == dialR[j].at(i) ){
+        cout << "true" << " ";
+      }
+      else{
+        cout << "false" << " ";
+        //--Counts false positive readings
+        falsePositives++;
+      }
     }
     puts("");
 //    Meter.showSegmentation();
   }
-}
 
+  printf("\n\n----------------------------------------------------------------\n\n");
+  cout << "Total Meters: " << totalSegmentations << endl;
+  cout << "Total Dials: " << totalDials << endl;
+  cout << "Bad Segmentations: " << badSegmentations << endl;
+  cout << "False Positives: " << falsePositives << endl;
+  cout <<"% False Positives: " << round( (double)falsePositives / totalDials * 100 ) << "%" << endl;
+  cout <<"% Bad Segmentations: " << round( (double)badSegmentations / totalSegmentations * 100 ) << "%" << endl;
+  cout << "Elapsed Time: " << (double)( clock() - Start ) /CLOCKS_PER_SEC << endl;
+}

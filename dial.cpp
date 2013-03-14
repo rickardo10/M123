@@ -56,48 +56,47 @@ void dial::dialProcessing( void )
 
   //--Creates an Structuring Element in order to apply morphology
   Mat element = getStructuringElement(MORPH_CROSS,
-                        Size(4, 4));
+                        Size(3, 3));
 
   Mat element2 = getStructuringElement(MORPH_CROSS,
-                        Size(2, 2));
+                        Size(3, 3));
 
+  Mat original = complement( img_thrshld );
   //--Applies an opening operation to the image
-  Mat img_dil;
-  dilate( img_thrshld, img_dil, element, Point( 1, 1 ), 3 );
-
   Mat img_ero;
-  erode( img_dil, img_ero, element2, Point( 1, 1 ), 4 );
+  erode( original, img_ero, element, Point( 1, 1 ), 2 );
 
-  //--Seeks dial place
-  Point Black = seekDial( img_ero, img_ero.cols / 2, img_ero.rows / 2 );
+  img_ero = filtering( img_ero );
 
-  //--Checks if point is inside the image
-  checkFailure( Black, img_ero );
-  if( failure ){
-    printf("Failure: fails floodfill in dial %d ", dialNumber );
-    return;
-  }
+//  imshow( "Filtered", img_ero );
 
-  //--Filters image
-  try{
-    floodFill( img_ero, Black, 150);
-  }
-  catch( cv::Exception ){
-    printf("Failure: floodfill\n");
-    return;
-  }
+  Mat img_dil;
+  dilate( img_ero, img_dil, element2, Point( 1, 1 ), 6 );
 
-  //--Binarizes image
-  Mat img_bin = binarization( img_ero );
+  Mat img_ero2;
+  erode( img_dil, img_ero2, element, Point( 1, 1 ), 10 );
+
+  img_ero2 = filtering( img_ero2 );
+
+//  imshow( "Original", img_thrshld);
+//  imshow( "Erosion", img_ero );
+//  imshow( "Erosion2", img_ero2 );
+//  imshow( "Dilate", img_dil );
+//  moveWindow( "Erosion", 200, 200 );
+//  moveWindow( "Original", 0, 200 );
+//  moveWindow( "Dilate", 400, 200 );
+//  moveWindow( "Filtered", 600, 200 );
+//  moveWindow( "Erosion2", 800, 200 );
+//  waitKey(0);
 
   //--Reads dial
-  dialReading( img_ero );
+  dialReading( img_ero2 );
 }
 
 ///--Seeks dial place
 Point dial::seekDial(Mat inputImg, int x, int y)
 {
-  while(inputImg.at<uchar>(x, y) == 255){
+  while(inputImg.at<uchar>(x, y) == 0){
     y += 1;
   }
   Point black(y,x);
@@ -110,9 +109,9 @@ Mat dial::binarization( Mat inputImg ){
   for( int i = 0; i < inputImg.rows; i++ ){
     for( int j = 0; j < inputImg.cols; j++ ){
       if( inputImg.at<uchar>(i, j) == 150 ){
-        inputImg.at<uchar>(i, j) = 0;
-      } else {
         inputImg.at<uchar>(i, j) = 255;
+      } else {
+        inputImg.at<uchar>(i, j) = 0;
       }
     }
   }
@@ -137,7 +136,7 @@ void dial::dialReading( Mat inputImg ){
   for( int i = 0; i < inputImg.rows; i++ ){
     for( int j = 0; j < inputImg.cols; j++ ){
 
-      if( inputImg.at<uchar>( Point( j, i ) ) == 0 ){
+      if( inputImg.at<uchar>( Point( j, i ) ) == 255 ){
         euclideanDistance = sqrt( pow( ( j - x ), 2 ) + pow( ( i - y ), 2 ) );
         if( euclideanDistance > maxED ){
           maxED = euclideanDistance;
@@ -186,6 +185,14 @@ void dial::dialReading( Mat inputImg ){
   //--Saves centroid and tip points
   centroid = Point( x1, y1 );
   tip = Point( x, y );
+
+  Mat img_new( imageDialColor);
+
+  circle( img_new, centroid, 3, Scalar( 0, 255, 0, 255 ), 1 );
+  circle( img_new, tip, 3, Scalar( 0, 255, 0, 255 ), 1  );
+
+//  imshow( "points", img_new );
+//  waitKey(0);
 }
 
 ///--Returns true if dialNumber is even
@@ -222,3 +229,45 @@ void dial::checkFailure( Point test, Mat img_scene )
   }
 }
 
+///--Complement of Image
+Mat dial::complement( Mat inputImg ){
+
+  for( int i = 0; i < inputImg.rows; i++ ){
+    for( int j = 0; j < inputImg.cols; j++ ){
+      if( inputImg.at<uchar>(i, j) == 255 ){
+        inputImg.at<uchar>(i, j) = 0;
+      } else {
+        inputImg.at<uchar>(i, j) = 255;
+      }
+    }
+  }
+
+  return inputImg;
+}
+
+///Filters an image in order to erase all the noise
+Mat dial::filtering( Mat img_orig )
+{
+    //--Seeks dial place
+    Point Black = seekDial( img_orig, img_orig.cols / 2, img_orig.rows / 2 );
+
+    //--Checks if point is inside the image
+    checkFailure( Black, img_orig );
+    if( failure ){
+      printf("Failure: fails floodfill in dial %d ", dialNumber );
+      return img_orig;
+    }
+
+    //--Filters image
+    try{
+      floodFill( img_orig, Black, 150);
+    }
+    catch( cv::Exception ){
+      printf("Failure: floodfill\n");
+      return img_orig;
+    }
+
+    img_orig = binarization( img_orig );
+
+    return img_orig;
+}
