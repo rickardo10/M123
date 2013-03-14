@@ -5,8 +5,10 @@
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include "meter.h"
 #include <iostream>
+#include <cmath>
+#include "meter.h"
+
 
 using namespace std;
 using namespace cv;
@@ -120,7 +122,7 @@ void meter::processData( void )
     }
   }
   
-  float desv = 2;
+  float desv = 2.5;
   //Seeks the best deviation
   do{
     //--Finds good matches
@@ -158,13 +160,31 @@ void meter::processData( void )
     //--Checks if segmentation is good
     checkSegmentation();
     desv += 0.1;
-  }while( failure == true &&  desv <= 7 );
+  }while( failure == true &&  desv <= 5 );
   
   //--If there is a failure prints error and returns
   if( failure ){
     printf("Failure: bad segmentation");
     return;
   }
+  
+  //--Finds the angle of inclination
+  double pi = 3.1415926535;
+  float oppositeC = scene_corner[ 3 ].y - scene_corner[ 2 ].y;
+  float adjacentC = scene_corner[ 2 ].x - scene_corner[ 3 ].x ;
+
+  float angleR = atan( oppositeC / adjacentC );
+  float angleD = ( float ) ( 180 * angleR ) / pi ;
+  
+  //--Rotates image
+  Point2f center( img_scene.cols / 2, img_scene.rows / 2 );
+  Mat rot_mat = getRotationMatrix2D( center, -angleD, .5 );
+  Mat dst;
+  warpAffine( img_scene, dst, rot_mat, img_scene.size() );
+  
+  imshow  ( "Rotated", dst );
+  waitKey( 0 );
+  
   cout << "\n" << desv << endl;
 }
 
@@ -232,7 +252,7 @@ void meter::checkSegmentation( void )
   }
 
   //--Checks if the segmentation form is a rectangle
-  if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.9 ||
+  if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.90 ||
         ((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) > 1.1){
     failure = true;
     //~ printf("Weird Rectangle Form ");
@@ -240,8 +260,8 @@ void meter::checkSegmentation( void )
   }
 
   //--Checks if the segmentation form is a rectangle
-  if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.9 ||
-        ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1){
+  if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.90||
+        ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1 ){
     failure = true;
     //~ printf("Weird Rectangle Form ");
     return;

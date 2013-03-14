@@ -70,7 +70,7 @@ int main( int argc, char *argv[] )
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn, "HARRIS", "BRIEF", "BruteForce-Hamming" );
+    meter Meter( scn );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
@@ -101,7 +101,7 @@ int main( int argc, char *argv[] )
       }
     }
     puts("");
-    //~ Meter.showSegmentation();
+    Meter.showSegmentation();
   }
 
   printf("\n\n----------------------------------------------------------------\n\n");
