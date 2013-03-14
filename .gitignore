@@ -24,3 +24,7 @@
 *.layout
 *.depend
 *.cbp
+
+
+# Text files
+*.txt
