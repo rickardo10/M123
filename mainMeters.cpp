@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 
   file.close();
 
+  //--Initializes a timer
   clock_t Start = clock();
 
    //--Concatenates file's names
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
       //--Counts readings
       totalDials++;
 
-      if( Dial.getReading() == dialR[j].at(i) ){
+      if( Dial.getReading() == dialR[j].at( i ) ){
         cout << "true" << " ";
       }
       else{
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
   cout << "Total Dials: " << totalDials << endl;
   cout << "Bad Segmentations: " << badSegmentations << endl;
   cout << "False Positives: " << falsePositives << endl;
-  cout <<"% False Positives: " << round( (double)falsePositives / totalDials * 100 ) << "%" << endl;
-  cout <<"% Bad Segmentations: " << round( (double)badSegmentations / totalSegmentations * 100 ) << "%" << endl;
+  cout <<"% False Positives: " << round( ( double ) falsePositives / totalDials * 100 ) << "%" << endl;
+  cout <<"% Bad Segmentations: " << round( ( double ) badSegmentations / totalSegmentations * 100 ) << "%" << endl;
   cout << "Elapsed Time: " << (double)( clock() - Start ) /CLOCKS_PER_SEC << endl;
 }

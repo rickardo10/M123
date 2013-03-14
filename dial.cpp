@@ -188,8 +188,8 @@ void dial::dialReading( Mat inputImg ){
 
   Mat img_new( imageDialColor);
 
-  circle( img_new, centroid, 3, Scalar( 0, 255, 0, 255 ), 1 );
-  circle( img_new, tip, 3, Scalar( 0, 255, 0, 255 ), 1  );
+  circle( img_new, centroid, 4, Scalar( 0, 0, 255 ), 1 );
+  circle( img_new, tip, 4, Scalar( 0, 0, 255 ), 1  );
 
 //  imshow( "points", img_new );
 //  waitKey(0);

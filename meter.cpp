@@ -158,8 +158,9 @@ void meter::processData( void )
     //--Checks if segmentation is good
     checkSegmentation();
     desv += 0.1;
-  }while( failure == true &&  desv < 5 );
+  }while( failure == true &&  desv <= 5 );
   
+  //--If there is a failure prints error and returns
   if( failure ){
     printf("Failure: bad segmentation");
     return;
@@ -176,17 +177,17 @@ void meter::cropDials( void )
   int yFin = round(scene_corner[2].y);
 
     try{
-    dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( ( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( (3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( (4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
 
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( (3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( (4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
     }
     catch( Exception ){
       failure = true;
