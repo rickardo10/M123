@@ -120,44 +120,51 @@ void meter::processData( void )
     }
   }
   
+  float desv = 2.5;
+  //Seeks the best deviation
   do{
-  float desv = 2.0;
-  //--Finds good matches
-  for( int i = 0; i < descriptors_object.rows; i++){ 
-    if( matches[i].distance <= desv * min_dist ){ 
-        good_matches.push_back( matches[i] ); 
+    //--Finds good matches
+    for( int i = 0; i < descriptors_object.rows; i++){ 
+      if( matches[i].distance <= desv * min_dist ){ 
+          good_matches.push_back( matches[i] ); 
+      }
     }
-  }
 
-  //--Stores good matches' points of object and scene
-  for(int i = 0; i < good_matches.size(); i++)
-  {
-    //--Get points from good matches
-    obj.push_back(keypoints_object[ good_matches[i].queryIdx ].pt);
-    scene.push_back(keypoints_scene[ good_matches[i].trainIdx ].pt);
-  }
+    //--Stores good matches' points of object and scene
+    for(int i = 0; i < good_matches.size(); i++)
+    {
+      //--Get points from good matches
+      obj.push_back(keypoints_object[ good_matches[i].queryIdx ].pt);
+      scene.push_back(keypoints_scene[ good_matches[i].trainIdx ].pt);
+    }
+    
+    try{
+    //--Gets perspective from scene
+    H = findHomography(obj, scene, CV_RANSAC);
+    } catch( Exception ){
+        desv += 0.1;
+        continue;
+    }
 
-  //--Gets perspective from scene
-  H = findHomography(obj, scene, CV_RANSAC);
+    //--Get the corners from the object
+    object_corner.push_back( cvPoint(0,0) );
+    object_corner.push_back( cvPoint(img_object.cols, 0) );
+    object_corner.push_back( cvPoint(img_object.cols, img_object.rows) );
+    object_corner.push_back( cvPoint(0, img_object.rows) );
 
-  //--Get the corners from the object
-  object_corner.push_back( cvPoint(0,0) );
-  object_corner.push_back( cvPoint(img_object.cols, 0) );
-  object_corner.push_back( cvPoint(img_object.cols, img_object.rows) );
-  object_corner.push_back( cvPoint(0, img_object.rows) );
+    //--Moves scene corners to fit dials
+    perspectiveTransform(object_corner, scene_corner, H);
 
-  //--Moves scene corners to fit dials
-  perspectiveTransform(object_corner, scene_corner, H);
-
-  //--Checks if segmentation is good
-  checkSegmentation();
-  desv += 0.1;
+    //--Checks if segmentation is good
+    checkSegmentation();
+    desv += 0.1;
   }while( failure == true &&  desv < 5 );
   
   if( failure ){
     printf("Failure: bad segmentation");
     return;
   }
+  cout << "\n" << desv << endl;
 }
 
 ///--Crops dials
@@ -183,6 +190,7 @@ void meter::cropDials( void )
     }
     catch( Exception ){
       failure = true;
+      printf("\n\nFailure: bad segmentation");
     }
 }
 
@@ -218,7 +226,7 @@ void meter::checkSegmentation( void )
   //--Checks if there is a segmentation
   if( ( scene_corner[2].x - scene_corner[3].x ) == 0  ){
     failure = true;
-    printf( "No Rectangle " );
+    //~ printf( "No Rectangle " );
     return;
   }
 
@@ -226,7 +234,7 @@ void meter::checkSegmentation( void )
   if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.9 ||
         ((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) > 1.1){
     failure = true;
-    printf("Weird Rectangle Form ");
+    //~ printf("Weird Rectangle Form ");
     return;
   }
 
@@ -234,21 +242,21 @@ void meter::checkSegmentation( void )
   if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.9 ||
         ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1){
     failure = true;
-    printf("Weird Rectangle Form ");
+    //~ printf("Weird Rectangle Form ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[1].x > img_scene.cols || scene_corner[0].x < 0 || scene_corner[3].x < 0){
     failure = true;
-    printf("Out of Limits ");
+    //~ printf("Out of Limits ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[3].y > img_scene.rows || scene_corner[0].y < 0 || scene_corner[1].y < 0){
     failure = true;
-    printf("Out of Limits ");
+    //~ printf("Out of Limits ");
     return;
   }
 

@@ -53,12 +53,12 @@ int main(int argc, char *argv[])
   clock_t Start = clock();
 
    //--Concatenates file's names
-  for( int i = 0; i <= 157; i++ ){
+  for( int i = 1; i <= 157; i++ ){
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
 
-    if( i == 150 || i == 151 || i == 111 ){
+    if( i == 4 || i == 6 || i == 15 || i == 101 || i == 133 || i == 150 || i == 151 || i == 152 ){
       continue;
     }
 
@@ -69,13 +69,13 @@ int main(int argc, char *argv[])
     printf("[Image %d] ", i );
 
     //--Creates and initialize a meter
-    meter Meter( scn, "HARRIS", "ORB", "BruteForce-Hamming" );
+    meter Meter( scn );
 
     //--Checks if there is any failure and continues if so
     if( Meter.getFailure() )
     {
       puts("");
-//      Meter.showSegmentation();
+     Meter.showSegmentation();
       badSegmentations++;
       continue;
     }
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
       }
     }
     puts("");
-//    Meter.showSegmentation();
+    Meter.showSegmentation();
   }
 
   printf("\n\n----------------------------------------------------------------\n\n");
