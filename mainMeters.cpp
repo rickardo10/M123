@@ -76,10 +76,8 @@ int main(int argc, char *argv[])
     {
       puts("");
 //      Meter.showSegmentation();
-<<<<<<< HEAD
-=======
+
       badSegmentations++;
->>>>>>> newBranch
       continue;
     }
 
