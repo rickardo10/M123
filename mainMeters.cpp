@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     sstm << i << extension;
     scn = sstm.str();
 
-    if( i == 150 || i == 151 || i == 111 ){
+    if( i == 4 || i == 6 || i == 15 || i == 101 || i == 133 || i == 150 || i == 151 || i == 152 ){
       continue;
     }
 
