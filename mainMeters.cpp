@@ -86,20 +86,33 @@ int main( int argc, char *argv[] )
 
     printf("Reading: ");
     for( int j = 4; j >= 0 ; j-- ){
-      dial Dial( Meter, j );
-      dials.push_back( Dial );
-      //--Counts readings
-      totalDials++;
+      if( j != 4 ){
+         dial Dial( Meter, j, dials[ j + 1 ].getReading() );
+         dials.push_back( Dial );
+         //--Counts readings
+         totalDials++;
+      }
+      else {
+         dial Dial( Meter, j );
+         dials.push_back( Dial );
+         //--Counts readings
+         totalDials++;
+      }
+    }
 
-      if( Dial.getReading() == dialR[ j ].at( i ) ){
+    for( int j = 0; j < 5; j++ ){
+      cout << dials[ j ].getReading() << " ";
+      if( dials[ j ].getReading() == dialR[ j ].at( i - 1 ) ){
         cout << "true" << " ";
       }
       else{
         cout << "false" << " ";
         //--Counts false positive readings
-        falsePositives++;
+       falsePositives++;
       }
     }
+
+
     puts("");
     Meter.showSegmentation();
   }
