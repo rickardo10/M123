@@ -16,19 +16,19 @@ public:
                string = "BruteForce", string = "diales.jpg" );
   void setObject( string sceneName, string featureDetName, string findDescriptorsName,
           string matcherName, string objectName );
-	void setImageObject( const string img_object );
-	void setImageScene( const string img_scene );
-	void setFeatureDetector( const string name_featureD );
+  void setImageObject( const string img_object );
+  void setImageScene( const string img_scene );
+  void setFeatureDetector( const string name_featureD );
   void setFindDescriptors( const string name_Fdescriptor );
   void setMatcher( const string matcherN );
-	void showKeypoints( void );
-	void processData( void );
-	bool getFailure( void );
+  void showKeypoints( void );
+  void processData( void );
+  bool getFailure( void );
+  float getAngle( void );
   void checkSegmentation( void );
   void cropDials( void );
-	Mat showSegmentation( void );
-	vector<Mat> getDials( void );
-
+  Mat showSegmentation( void );
+  vector<Mat> getDials( void );
 
 private:
 
@@ -43,6 +43,7 @@ private:
    string name_descriptor;
    string name_matcher;
    bool failure;
+   float angleR;
    vector<KeyPoint> keypoints_object;
    vector<KeyPoint> keypoints_scene;
    vector<DMatch> matches;

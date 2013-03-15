@@ -112,7 +112,7 @@ void meter::processData( void )
   double max_dist = 0; double min_dist = 100;
 
   //--Finds max and min distances between descriptors
-  for( int i = 0; i < descriptors_object.rows; i++ ){ 
+  for( int i = 0; i < descriptors_object.rows; i++ ){
     double dist = matches[i].distance;
     if(dist < min_dist) {
       min_dist = dist;
@@ -121,14 +121,14 @@ void meter::processData( void )
       max_dist = dist;
     }
   }
-  
+
   float desv = 2.5;
   //Seeks the best deviation
   do{
     //--Finds good matches
-    for( int i = 0; i < descriptors_object.rows; i++){ 
-      if( matches[i].distance <= desv * min_dist ){ 
-          good_matches.push_back( matches[i] ); 
+    for( int i = 0; i < descriptors_object.rows; i++){
+      if( matches[i].distance <= desv * min_dist ){
+          good_matches.push_back( matches[i] );
       }
     }
 
@@ -139,7 +139,7 @@ void meter::processData( void )
       obj.push_back(keypoints_object[ good_matches[i].queryIdx ].pt);
       scene.push_back(keypoints_scene[ good_matches[i].trainIdx ].pt);
     }
-    
+
     try{
     //--Gets perspective from scene
     H = findHomography(obj, scene, CV_RANSAC);
@@ -161,31 +161,19 @@ void meter::processData( void )
     checkSegmentation();
     desv += 0.1;
   }while( failure == true &&  desv <= 5 );
-  
+
   //--If there is a failure prints error and returns
   if( failure ){
     printf("Failure: bad segmentation");
     return;
   }
-  
+
   //--Finds the angle of inclination
   double pi = 3.1415926535;
   float oppositeC = scene_corner[ 3 ].y - scene_corner[ 2 ].y;
   float adjacentC = scene_corner[ 2 ].x - scene_corner[ 3 ].x ;
-
-  float angleR = atan( oppositeC / adjacentC );
-  float angleD = ( float ) ( 180 * angleR ) / pi ;
-  
-  //--Rotates image
-  Point2f center( img_scene.cols / 2, img_scene.rows / 2 );
-  Mat rot_mat = getRotationMatrix2D( center, -angleD, .5 );
-  Mat dst;
-  warpAffine( img_scene, dst, rot_mat, img_scene.size() );
-  
-  cout << "\n" << desv << endl;
+  angleR = atan( oppositeC / adjacentC );
 }
-
-
 
 ///--Crops dials
 void meter::cropDials( void )
@@ -309,13 +297,17 @@ bool meter::getFailure()
   return failure;
 }
 
-///-Returns vector dials
+///--Returns vector dials
 vector<Mat> meter::getDials( void )
 {
   return dials;
 }
 
-
+///--Returns angle of inclination
+float meter::getAngle( void )
+{
+   return angleR;
+}
 
 
 

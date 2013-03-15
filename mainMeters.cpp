@@ -76,7 +76,7 @@ int main( int argc, char *argv[] )
     if( Meter.getFailure() )
     {
       puts("");
-     //~ Meter.showSegmentation();
+//     Meter.showSegmentation();
       badSegmentations++;
       continue;
     }
@@ -85,13 +85,13 @@ int main( int argc, char *argv[] )
     vector<dial> dials;
 
     printf("Reading: ");
-    for( int j = 0; j < 5; j++ ){
+    for( int j = 4; j >= 0 ; j-- ){
       dial Dial( Meter, j );
       dials.push_back( Dial );
       //--Counts readings
       totalDials++;
 
-      if( Dial.getReading() == dialR[j].at( i ) ){
+      if( Dial.getReading() == dialR[ j ].at( i ) ){
         cout << "true" << " ";
       }
       else{

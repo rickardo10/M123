@@ -13,11 +13,12 @@ class dial
 {
 public:
 
-  dial( const meter, int );
+  dial( const meter, int dialN, int rightDialReading = -1 );
   void setDialNumber( int d );
   void setDial( vector<Mat> dialI );
   void test( void );
   void setDialImage( void );
+  void setRReading( int rReading );
   void dialProcessing( void );
   void checkFailure( Point test, Mat img_scene );
   Point seekDial(Mat inputImg, int x, int y);
@@ -36,6 +37,7 @@ private:
   vector<Mat> Dial;
   int dialNumber;
   int reading;
+  int rightReading;
   Mat imageDial;
   Mat imageDialColor;
   Point centroid;

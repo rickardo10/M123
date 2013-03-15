@@ -13,12 +13,13 @@ using namespace std;
 using namespace cv;
 
 ///--Constructor
-dial::dial( const meter rMeter, int dialNumber )
+dial::dial( const meter, int dialN, int rightDialReading )
 : Meter( rMeter )
 {
   setDial( Meter.getDials() );
   setDialNumber( dialNumber );
   setDialImage();
+  setRReading( rightDialReading );
   dialProcessing();
 }
 
@@ -26,6 +27,12 @@ dial::dial( const meter rMeter, int dialNumber )
 void dial::setDial( vector<Mat> dialI )
 {
   Dial = dialI;
+}
+
+///--Reads the reading of the next dial
+void dial::setRReading( int rReading )
+{
+   rightReading = rReading;
 }
 
 ///--Reads the dial to be analyzed
@@ -157,27 +164,31 @@ void dial::dialReading( Mat inputImg ){
   //--Calculates the angle using atan, asin, acos
   double teta1 = atan( (double)( y - y1 ) / ( x1 - x ) );
   double teta2 = asin( (double)( y - y1 ) / hyp );
-  double teta3 = acos( (double)( x1 - x ) / hyp );
 
-  reading = 0;
+   //--Adds the image inclination
+   teta1 -= Meter.getAngle();
 
   //--Verifies in which interval the actual angle fits and saves the reading
   for( int i = 0; i <= 5; i ++){
+    //--
     if( teta1 <= numbers[ i ] && teta1 > numbers[ i + 1 ]){
+
       if( teta1 > 0 && teta2 < 0 ){
         reading = i + 5;
         continue;
       }
+
       if( teta1 < 0 && teta2 > 0){
         reading = i + 5;
         continue;
       }
+
       reading = i;
       continue;
     }
   }
 
-  //--If the dial is even then it's reading is differnt
+  //--If the dial is even then its reading is differnt
   if( evenDialType() ){
     reading = 9 - reading;
   }
@@ -190,9 +201,6 @@ void dial::dialReading( Mat inputImg ){
 
   circle( img_new, centroid, 4, Scalar( 0, 0, 255 ), 1 );
   circle( img_new, tip, 4, Scalar( 0, 0, 255 ), 1  );
-
-//  imshow( "points", img_new );
-//  waitKey(0);
 }
 
 ///--Returns true if dialNumber is even
