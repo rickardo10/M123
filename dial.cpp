@@ -172,7 +172,7 @@ void dial::dialReading( Mat inputImg ){
   //--Verifies in which interval the actual angle fits and saves the reading
   for( int i = 0; i <= 5; i ++){
     //--Checks if the angle is in the current interval
-    if( teta1 <= numbers[ i ] && teta1 > numbers[ i + 1 ]){
+    if( teta1 <= numbers[ i ] && teta1 > numbers[ i + 1 ] ){
       //--If tan is positive and sin es negative then the dial is pointing at the other
       //half of the circle
       if( teta1 > 0 && teta2 < 0 ){

@@ -87,7 +87,7 @@ int main( int argc, char *argv[] )
     printf("Reading: ");
     for( int j = 4; j >= 0 ; j-- ){
       if( j != 4 ){
-         dial Dial( Meter, j, dials[ j + 1 ].getReading() );
+         dial Dial( Meter, j, dials[ j - 1 ].getReading() );
          dials.push_back( Dial );
          //--Counts readings
          totalDials++;
@@ -101,8 +101,8 @@ int main( int argc, char *argv[] )
     }
 
     for( int j = 0; j < 5; j++ ){
-      cout << dials[ j ].getReading() << " ";
-      if( dials[ j ].getReading() == dialR[ j ].at( i - 1 ) ){
+      cout << dials[ 4 - j ].getReading() << " ";
+      if( dials[ 4 - j ].getReading() == dialR[ j ].at( i - 1 ) ){
         cout << "true" << " ";
       }
       else{
