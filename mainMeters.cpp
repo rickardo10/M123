@@ -83,26 +83,26 @@ int main( int argc, char *argv[] )
 
     //--Creates a vector with the 5 dials
     vector<dial> dials;
-
-    printf("Reading: ");
-    for( int j = 4; j >= 0 ; j-- ){
-      if( j != 4 ){
-         dial Dial( Meter, j, dials[ j - 1 ].getReading() );
-         dials.push_back( Dial );
-         //--Counts readings
-         totalDials++;
-      }
-      else {
-         dial Dial( Meter, j );
-         dials.push_back( Dial );
-         //--Counts readings
-         totalDials++;
-      }
+    for( int j = 0; j < 5 ; j++ ){
+     dial Dial( Meter, j );
+     dials.push_back( Dial );
+     //--Counts readings
+     totalDials++;
     }
 
+    //--Sets the right reading
+    for( int j = 0; j < 4; j++ ){
+      int rReading = dials[ j + 1 ].getReading();
+      dials[ j ].setRReading( rReading );
+    }
+
+
+
+    printf("Reading: ");
+    //--Prints and compares readings
     for( int j = 0; j < 5; j++ ){
-      cout << dials[ 4 - j ].getReading() << " ";
-      if( dials[ 4 - j ].getReading() == dialR[ j ].at( i - 1 ) ){
+      cout << dials[ j ].getReading() << " ";
+      if( dials[ j ].getReading() == dialR[ j ].at( i - 1 ) ){
         cout << "true" << " ";
       }
       else{

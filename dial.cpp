@@ -13,13 +13,12 @@ using namespace std;
 using namespace cv;
 
 ///--Constructor
-dial::dial( const meter rMeter, int dialN, int rightDialReading )
+dial::dial( const meter rMeter, int dialN )
 : Meter( rMeter )
 {
   setDial( Meter.getDials() );
   setDialNumber( dialN );
   setDialImage();
-  setRReading( rightDialReading );
   dialProcessing();
 }
 
@@ -190,23 +189,14 @@ void dial::dialReading( Mat inputImg ){
   }
 
 //  //--Checks if the dial is near the previous interval
-//  if( teta1  < ( numbers[ reading ] + pi / 25 )  && ( teta1 > ( numbers[ reading ] - pi / 25 ) ) )
+//  if( teta1  < ( numbers[ reading ] + pi / 25 ) )
 //  {
-//      if( rightReading >= 0 || rightReading < 5 )
-//      {
-//         reading+= 1;
-//      }
-//   }
-//   else {
-//     //--Checks if the dial is near the next interval
-//     if( ( teta1  < ( numbers[ reading + 1 ] + pi / 25 )  ) && ( teta1 > ( numbers[ reading + 1 ] - pi / 25 ) ) )
-//     {
-//         if( rightReading >= 0 || rightReading < 5 )
-//         {
-//            reading+= 1;
-//         }
-//      }
-//   }
+//    if( rightReading >= 0 || rightReading < 5 )
+//    {
+//       reading += 1;
+//    }
+//  }
+
 
   //--If the dial is even then its reading is differnt
   if( evenDialType() ){
