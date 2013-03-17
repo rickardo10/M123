@@ -13,7 +13,7 @@ class dial
 {
 public:
 
-  dial( const meter, int dialN );
+  dial( const meter, int dialN, int rReading = 10 );
   void setDialNumber( int d );
   void setDial( vector<Mat> dialI );
   void test( void );

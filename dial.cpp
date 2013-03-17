@@ -13,12 +13,13 @@ using namespace std;
 using namespace cv;
 
 ///--Constructor
-dial::dial( const meter rMeter, int dialN )
+dial::dial( const meter rMeter, int dialN, int rReading )
 : Meter( rMeter )
 {
   setDial( Meter.getDials() );
   setDialNumber( dialN );
   setDialImage();
+  setRReading( rReading );
   dialProcessing();
 }
 
@@ -129,6 +130,7 @@ Mat dial::binarization( Mat inputImg ){
 void dial::dialReading( Mat inputImg ){
   double x, y;
   double pi = 3.1415926535;
+  int cpyReading = 0;
 
   //--Calculates moments and finds centroid
   Moments moments1 =  moments( inputImg, true );
@@ -191,19 +193,21 @@ void dial::dialReading( Mat inputImg ){
     }
   }
 
+  //--Creates a copy of variable reading before it modifies it
+  cpyReading = reading;
+
+  //--If the dial is even then its reading is differnt
+  if( evenDialType() ){
+    reading = 9 - reading;
+  }
+
   //--Checks if the dial is near the previous interval
-  if( teta1  < ( numbers[ reading ] + pi / 50 ) )
+  if( teta1  < ( numbers[ cpyReading ] + pi / 25 ) && teta1 > ( numbers[ cpyReading ] - pi / 25 ) )
   {
     if( rightReading < 5 )
     {
        reading += 1;
     }
-  }
-
-
-  //--If the dial is even then its reading is differnt
-  if( evenDialType() ){
-    reading = 9 - reading;
   }
 
   //--Saves centroid and tip points

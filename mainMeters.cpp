@@ -23,6 +23,8 @@ and the object and find matches.
 using namespace std;
 using namespace cv;
 
+vector<dial> setDiales( meter Meter );
+
 int main( int argc, char *argv[] )
 {
    const string obj = "diales.jpg";
@@ -54,7 +56,7 @@ int main( int argc, char *argv[] )
   clock_t Start = clock();
 
    //--Concatenates file's names
-  for( int i = 1; i <= 157; i++ ){
+  for( int i = 5; i <= 157; i++ ){
     stringstream sstm;
     sstm << i << extension;
     scn = sstm.str();
@@ -81,22 +83,8 @@ int main( int argc, char *argv[] )
       continue;
     }
 
-    //--Creates a vector with the 5 dials
-    vector<dial> dials;
-    for( int j = 0; j < 5 ; j++ ){
-     dial Dial( Meter, j );
-     dials.push_back( Dial );
-     //--Counts readings
-     totalDials++;
-    }
-
-    //--Sets the right reading
-    for( int j = 0; j < 4; j++ ){
-      int rReading = dials[ j + 1 ].getReading();
-      dials[ j ].setRReading( rReading );
-    }
-
-
+    //--Initializes a vector with the Meter's dials
+    vector<dial> dials = setDiales( Meter );
 
     printf("Reading: ");
     //--Prints and compares readings
@@ -125,4 +113,26 @@ int main( int argc, char *argv[] )
   cout <<"% False Positives: " << round( ( double ) falsePositives / totalDials * 100 ) << "%" << endl;
   cout <<"% Bad Segmentations: " << round( ( double ) badSegmentations / totalSegmentations * 100 ) << "%" << endl;
   cout << "Elapsed Time: " << (double)( clock() - Start ) /CLOCKS_PER_SEC << endl;
+}
+
+///--Initializes the 5 dials of a Meter
+vector<dial> setDiales( meter Meter )
+{
+  dial Dial4( Meter, 4 );
+  dial Dial3( Meter, 3, Dial4.getReading() );
+  dial Dial2( Meter, 2, Dial3.getReading() );
+  dial Dial1( Meter, 1, Dial2.getReading() );
+  dial Dial0( Meter, 0, Dial1.getReading() );
+
+  cout << Dial3.getReading() << endl;
+
+  //--Creates a vector with the 5 dials
+  vector<dial> dials;
+  dials.push_back( Dial0 );
+  dials.push_back( Dial1 );
+  dials.push_back( Dial2 );
+  dials.push_back( Dial3 );
+  dials.push_back( Dial4 );
+
+  return dials;
 }
