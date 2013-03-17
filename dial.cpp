@@ -176,26 +176,29 @@ void dial::dialReading( Mat inputImg ){
       //half of the circle
       if( teta1 > 0 && teta2 < 0 ){
         reading = i + 5;
+        break;
       }
 
       //--If tan is negative and sin is positive then the dial is pointing at the other
       //half of the circle
       if( teta1 < 0 && teta2 > 0){
         reading = i + 5;
+        break;
       }
 
       reading = i;
+      break;
     }
   }
 
-//  //--Checks if the dial is near the previous interval
-//  if( teta1  < ( numbers[ reading ] + pi / 25 ) )
-//  {
-//    if( rightReading >= 0 || rightReading < 5 )
-//    {
-//       reading += 1;
-//    }
-//  }
+  //--Checks if the dial is near the previous interval
+  if( teta1  < ( numbers[ reading ] + pi / 50 ) )
+  {
+    if( rightReading < 5 )
+    {
+       reading += 1;
+    }
+  }
 
 
   //--If the dial is even then its reading is differnt
