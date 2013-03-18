@@ -177,6 +177,8 @@ void dial::dialReading( Mat inputImg ){
       //--If tan is positive and sin es negative then the dial is pointing at the other
       //half of the circle
       if( teta1 > 0 && teta2 < 0 ){
+        //--Creates a copy of variable reading before it modifies it
+        cpyReading = i;
         reading = i + 5;
         break;
       }
@@ -184,30 +186,55 @@ void dial::dialReading( Mat inputImg ){
       //--If tan is negative and sin is positive then the dial is pointing at the other
       //half of the circle
       if( teta1 < 0 && teta2 > 0){
+         //--Creates a copy of variable reading before it modifies it
+        cpyReading = i;
         reading = i + 5;
         break;
       }
-
+      //--Creates a copy of variable reading before it modifies it
+      cpyReading = i;
       reading = i;
       break;
     }
   }
-
-  //--Creates a copy of variable reading before it modifies it
-  cpyReading = reading;
 
   //--If the dial is even then its reading is differnt
   if( evenDialType() ){
     reading = 9 - reading;
   }
 
-  //--Checks if the dial is near the previous interval
-  if( teta1  < ( numbers[ cpyReading ] + pi / 25 ) && teta1 > ( numbers[ cpyReading ] - pi / 25 ) )
+  cout << "izquierda: "<< ( ( numbers[ cpyReading  ] ) - pi / 25 ) << " " << teta1 << " " << ( numbers[ cpyReading ] ) << endl;
+  cout << reading << endl;
+  cout << "derecha: " << ( numbers[ cpyReading + 1 ] ) << " " << teta1 << " " << ( ( numbers[ cpyReading + 1 ] ) + pi / 25 ) << "\n" << endl;
+
+
+  //--Checks if the dial reads counterclockwise and if it is near the previous interval
+  if( evenDialType() )
   {
-    if( rightReading < 5 )
+    if( teta1  < ( numbers[ cpyReading ] ) && teta1 > ( numbers[ cpyReading  ] ) - pi / 25 )
     {
-       reading += 1;
+      if( rightReading < 5 )
+      {
+         reading += 1;
+      }
     }
+  }
+
+  //--Checks if the dial reads clockwise and if it is near the previous interval
+  if( !evenDialType() )
+  {
+    if( teta1  < ( numbers[ cpyReading + 1 ] + pi / 25 ) && teta1 > ( numbers[ cpyReading + 1 ] ) )
+    {
+      if( rightReading < 5 )
+      {
+         reading += 1;
+      }
+    }
+  }
+
+  //--Checks if dial is equal to 10, if it is, it will change it to 0
+  if( reading == 10 ){
+    reading = 0;
   }
 
   //--Saves centroid and tip points

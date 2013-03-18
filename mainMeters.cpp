@@ -89,8 +89,8 @@ int main( int argc, char *argv[] )
     printf("Reading: ");
     //--Prints and compares readings
     for( int j = 0; j < 5; j++ ){
-      cout << dials[ j ].getReading() << " ";
-      if( dials[ j ].getReading() == dialR[ j ].at( i - 1 ) ){
+       cout << dials[ j ].getReading() << " ";
+       if( dials[ j ].getReading() == dialR[ j ].at( i - 1 ) ){
         cout << "true" << " ";
       }
       else{
@@ -100,10 +100,10 @@ int main( int argc, char *argv[] )
       }
     }
 
-
     puts("");
     Meter.showSegmentation();
   }
+  totalDials = ( totalSegmentations - badSegmentations ) * 5;
 
   printf("\n\n----------------------------------------------------------------\n\n");
   cout << "Total Meters: " << totalSegmentations << endl;
@@ -123,8 +123,6 @@ vector<dial> setDiales( meter Meter )
   dial Dial2( Meter, 2, Dial3.getReading() );
   dial Dial1( Meter, 1, Dial2.getReading() );
   dial Dial0( Meter, 0, Dial1.getReading() );
-
-  cout << Dial3.getReading() << endl;
 
   //--Creates a vector with the 5 dials
   vector<dial> dials;
