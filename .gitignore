@@ -25,6 +25,9 @@
 *.depend
 *.cbp
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> Medidoresv3.0
 # Text files
 *.txt

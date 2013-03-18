@@ -5,8 +5,10 @@
 #include <vector>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include "meter.h"
 #include <iostream>
+#include <cmath>
+#include "meter.h"
+
 
 using namespace std;
 using namespace cv;
@@ -110,44 +112,67 @@ void meter::processData( void )
   double max_dist = 0; double min_dist = 100;
 
   //--Finds max and min distances between descriptors
-  for(int i = 0; i < descriptors_object.rows; i++)
-  { double dist = matches[i].distance;
-    if(dist < min_dist) min_dist = dist;
-    if(dist > max_dist) max_dist = dist;
+  for( int i = 0; i < descriptors_object.rows; i++ ){
+    double dist = matches[i].distance;
+    if(dist < min_dist) {
+      min_dist = dist;
+    }
+    if( dist > max_dist ) {
+      max_dist = dist;
+    }
   }
 
-  //--Finds good matches
-  for(int i = 0; i < descriptors_object.rows; i++)
-  { if(matches[i].distance <= 3.4 * min_dist)
-     { good_matches.push_back( matches[i]); }
-  }
+  float desv = 2.5;
+  //Seeks the best deviation
+  do{
+    //--Finds good matches
+    for( int i = 0; i < descriptors_object.rows; i++){
+      if( matches[i].distance <= desv * min_dist ){
+          good_matches.push_back( matches[i] );
+      }
+    }
 
-  //--Stores good matches' points of object and scene
-  for(int i = 0; i < good_matches.size(); i++)
-  {
-    //--Get points from good matches
-    obj.push_back(keypoints_object[ good_matches[i].queryIdx ].pt);
-    scene.push_back(keypoints_scene[ good_matches[i].trainIdx ].pt);
-  }
+    //--Stores good matches' points of object and scene
+    for(int i = 0; i < good_matches.size(); i++)
+    {
+      //--Get points from good matches
+      obj.push_back(keypoints_object[ good_matches[i].queryIdx ].pt);
+      scene.push_back(keypoints_scene[ good_matches[i].trainIdx ].pt);
+    }
 
-  //--Gets perspective from scene
-  H = findHomography(obj, scene, CV_RANSAC);
+    try{
+    //--Gets perspective from scene
+    H = findHomography(obj, scene, CV_RANSAC);
+    } catch( Exception ){
+        desv += 0.1;
+        continue;
+    }
 
-  //--Get the corners from the object
-  object_corner.push_back( cvPoint(0,0) );
-  object_corner.push_back( cvPoint(img_object.cols, 0) );
-  object_corner.push_back( cvPoint(img_object.cols, img_object.rows) );
-  object_corner.push_back( cvPoint(0, img_object.rows) );
+    //--Get the corners from the object
+    object_corner.push_back( cvPoint(0,0) );
+    object_corner.push_back( cvPoint(img_object.cols, 0) );
+    object_corner.push_back( cvPoint(img_object.cols, img_object.rows) );
+    object_corner.push_back( cvPoint(0, img_object.rows) );
 
-  //--Moves scene corners to fit dials
-  perspectiveTransform(object_corner, scene_corner, H);
+    //--Moves scene corners to fit dials
+    perspectiveTransform(object_corner, scene_corner, H);
 
-  //--Checks if segmentation is good
-  checkSegmentation();
+    //--Checks if segmentation is good
+    checkSegmentation();
+    desv += 0.1;
+  }while( failure == true &&  desv <= 5 );
+
+  //--If there is a failure prints error and returns
   if( failure ){
     printf("Failure: bad segmentation");
     return;
   }
+
+  //--Finds the angle of inclination
+  double pi = 3.1415926535;
+  float oppositeC = scene_corner[ 3 ].y - scene_corner[ 2 ].y;
+  float adjacentC = scene_corner[ 2 ].x - scene_corner[ 3 ].x ;
+  angleR = atan( oppositeC / adjacentC );
 }
 
 ///--Crops dials
@@ -159,20 +184,21 @@ void meter::cropDials( void )
   int yFin = round(scene_corner[2].y);
 
     try{
-    dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-    dials.push_back( img_scene( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( ( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( (3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+      dials.push_back( img_scene( Range( yInit, yFin ), Range( (4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
 
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range(( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
-    dials.push_back( img_sceneColor( Range( yInit, yFin ), Range((4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( xInit, (xFin + 4 * xInit)/5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( xFin + 4 * xInit ) / 5, ( 2 * xFin + 3 * xInit) / 5) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( ( 2  * xFin + 3 * xInit) / 5, ( 3 * xFin + 2 * xInit ) / 5 ) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( (3 * xFin + 2 * xInit)/5, ( 4 * xFin + 1 * xInit ) / 5 ) ) );
+      dials.push_back( img_sceneColor( Range( yInit, yFin ), Range( (4 * xFin + 1 * xInit)/5, ( 5 * xFin + 0 * xInit ) / 5) ) );
     }
     catch( Exception ){
       failure = true;
+      printf("\n\nFailure: bad segmentation");
     }
 }
 
@@ -208,37 +234,37 @@ void meter::checkSegmentation( void )
   //--Checks if there is a segmentation
   if( ( scene_corner[2].x - scene_corner[3].x ) == 0  ){
     failure = true;
-    printf( "No Rectangle " );
+    //~ printf( "No Rectangle " );
     return;
   }
 
   //--Checks if the segmentation form is a rectangle
-  if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.9 ||
+  if(((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) < 0.90 ||
         ((scene_corner[1].x - scene_corner[0].x) / (scene_corner[2].x - scene_corner[3].x)) > 1.1){
     failure = true;
-    printf("Weird Rectangle Form ");
+    //~ printf("Weird Rectangle Form ");
     return;
   }
 
   //--Checks if the segmentation form is a rectangle
-  if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.9 ||
-        ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1){
+  if(((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) < 0.90||
+        ((scene_corner[3].y - scene_corner[0].y) / (scene_corner[2].y - scene_corner[1].y)) > 1.1 ){
     failure = true;
-    printf("Weird Rectangle Form ");
+    //~ printf("Weird Rectangle Form ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[1].x > img_scene.cols || scene_corner[0].x < 0 || scene_corner[3].x < 0){
     failure = true;
-    printf("Out of Limits ");
+    //~ printf("Out of Limits ");
     return;
   }
 
   //--Checks if corner points are inside the image
   if(scene_corner[3].y > img_scene.rows || scene_corner[0].y < 0 || scene_corner[1].y < 0){
     failure = true;
-    printf("Out of Limits ");
+    //~ printf("Out of Limits ");
     return;
   }
 
@@ -271,13 +297,17 @@ bool meter::getFailure()
   return failure;
 }
 
-///-Returns vector dials
+///--Returns vector dials
 vector<Mat> meter::getDials( void )
 {
   return dials;
 }
 
-
+///--Returns angle of inclination
+float meter::getAngle( void )
+{
+   return angleR;
+}
 
 
 
