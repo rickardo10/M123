@@ -203,6 +203,14 @@ void dial::dialReading( Mat inputImg ){
     reading = 9 - reading;
   }
 
+<<<<<<< HEAD
+=======
+//  cout << "izquierda: "<< ( ( numbers[ cpyReading  ] ) - pi / 25 ) << " " << teta1 << " " << ( numbers[ cpyReading ] ) << endl;
+//  cout << reading << endl;
+//  cout << "derecha: " << ( numbers[ cpyReading + 1 ] ) << " " << teta1 << " " << ( ( numbers[ cpyReading + 1 ] ) + pi / 25 ) << "\n" << endl;
+
+
+>>>>>>> master
   //--Checks if the dial reads counterclockwise and if it is near the previous interval
   if( evenDialType() )
   {
