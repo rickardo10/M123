@@ -68,9 +68,6 @@ int main( int argc, char *argv[] )
     //--Counts segmentations
     totalSegmentations++;
 
-    //--Prints image number
-    printf("[Image %d] ", i );
-
     //--Creates and initialize a meter
     meter Meter( scn );
 
@@ -88,7 +85,8 @@ int main( int argc, char *argv[] )
     //--Initializes a vector with the Meter's dials
     vector<dial> dials = setDiales( Meter );
 
-    printf("Reading: ");
+    //--Prints image number
+    printf("[Image %d]: Reading ", i );
     //--Prints and compares readings
     for( int j = 0; j < 5; j++ ){
        cout << dials[ j ].getReading() << " ";

@@ -203,14 +203,15 @@ void dial::dialReading( Mat inputImg ){
     reading = 9 - reading;
   }
 
-<<<<<<< HEAD
-=======
-//  cout << "izquierda: "<< ( ( numbers[ cpyReading  ] ) - pi / 25 ) << " " << teta1 << " " << ( numbers[ cpyReading ] ) << endl;
-//  cout << reading << endl;
-//  cout << "derecha: " << ( numbers[ cpyReading + 1 ] ) << " " << teta1 << " " << ( ( numbers[ cpyReading + 1 ] ) + pi / 25 ) << "\n" << endl;
+  if( teta1 > 0 && reading == -1 ){
+    reading = 0;
+  }
+
+  if( teta1 < 0 && reading == -1 ){
+    reading = 5;
+  }
 
 
->>>>>>> master
   //--Checks if the dial reads counterclockwise and if it is near the previous interval
   if( evenDialType() )
   {
@@ -309,7 +310,7 @@ Mat dial::filtering( Mat img_orig )
     //--Checks if point is inside the image
     checkFailure( Black, img_orig );
     if( failure ){
-      printf("Failure: fails floodfill in dial %d ", dialNumber );
+      printf("Failure: fails floodfill in dial %d\n", dialNumber );
       return img_orig;
     }
 
