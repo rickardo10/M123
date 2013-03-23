@@ -24,6 +24,7 @@ public:
   void showKeypoints( void );
   void processData( void );
   bool getFailure( void );
+  bool checkDials( Mat inputImg );
   float getAngle( void );
   void checkSegmentation( void );
   void cropDials( void );

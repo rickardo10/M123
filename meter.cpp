@@ -30,10 +30,6 @@ void meter::setObject( string sceneName, string featureDetName, string findDescr
   setFindDescriptors( findDescriptorsName );
   setMatcher( matcherName );
   processData();
-
-  if( !failure ){
-    cropDials();
-  }
 }
 
 ///--Reads object
@@ -159,6 +155,12 @@ void meter::processData( void )
 
     //--Checks if segmentation is good
     checkSegmentation();
+
+    //--Checks if the rectangle is surrounding dials
+    if( !failure ){
+      cropDials();
+    }
+
     desv += 0.1;
   }while( failure == true &&  desv <= 5 );
 
@@ -199,6 +201,18 @@ void meter::cropDials( void )
     catch( Exception ){
       failure = true;
       printf("\n\nFailure: bad segmentation");
+    }
+
+    //--Checks if the rectangle is surrounding the dials
+    for( int i = 0; i < 5; i++ ){
+      Mat image;
+      threshold( dials[ i ], image, 0, 255, THRESH_OTSU );
+
+      //--If there is a failure stop
+      if( checkDials( image ) ){
+        failure = true;
+        return;
+      }
     }
 }
 
@@ -289,8 +303,6 @@ void meter::showKeypoints( void )
   destroyWindow("Keypoints");
 }
 
-
-
 ///--Returns variable failure
 bool meter::getFailure()
 {
@@ -309,7 +321,29 @@ float meter::getAngle( void )
    return angleR;
 }
 
+///--Checks if rectangle surround the 5 diasls
+bool meter::checkDials( Mat inputImg ){
 
+  int sum = 0;
+
+  //--Counts pixels
+  for( int i = 0; i < inputImg.rows; i++ ){
+    for( int j = 0; j < inputImg.cols; j++ ){
+      if( inputImg.at<uchar>(i, j) == 0 ){
+        sum++;
+      }
+    }
+  }
+
+  double pixelProp = (double) sum / ( inputImg.rows * inputImg.cols );
+
+  //--Returns true if there are more pixels than expected of less pixels than expected
+  if( pixelProp < 0.18 || pixelProp > 0.40 ){
+    return true;
+  }
+
+  return false;
+}
 
 
 
