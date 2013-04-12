@@ -108,7 +108,7 @@ int main( int argc, char *argv[] )
     }
 
     puts("");
-    Meter.showSegmentation();
+//    Meter.showSegmentation();
   }
   totalDials = ( totalSegmentations - badSegmentations ) * 5;
 
