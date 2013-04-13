@@ -21,7 +21,7 @@ public:
   void setRReading( int rReading );
   void dialProcessing( void );
   void checkFailure( Point test, Mat img_scene );
-  Point seekDial(Mat inputImg, int x, int y);
+  Point seekDial(Mat inputImg );
   Mat binarization( Mat inputImg );
   void dialReading( Mat inputImg );
   bool evenDialType( void );

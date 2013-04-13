@@ -62,52 +62,93 @@ void dial::dialProcessing( void )
   threshold( imageDial, img_thrshld, 0, 255,  THRESH_OTSU );
 
   //--Creates an Structuring Element in order to apply morphology
-  Mat element = getStructuringElement(MORPH_CROSS,
-                        Size(3, 3));
+  Mat element = getStructuringElement( MORPH_CROSS,
+                        Size( 13, 13 ) );
 
   Mat element2 = getStructuringElement(MORPH_CROSS,
                         Size(3, 3));
 
   Mat original = complement( img_thrshld );
+
   //--Applies an opening operation to the image
   Mat img_ero;
-  erode( original, img_ero, element, Point( 1, 1 ), 2 );
+  erode( original, img_ero, element, Point( 1, 1 ), 1 );
 
   img_ero = filtering( img_ero );
 
-//  imshow( "Filtered", img_ero );
+  imshow( "Filtered", img_ero );
 
   Mat img_dil;
   dilate( img_ero, img_dil, element2, Point( 1, 1 ), 6 );
 
   Mat img_ero2;
-  erode( img_dil, img_ero2, element, Point( 1, 1 ), 10 );
+  erode( img_dil, img_ero2, element2, Point( 1, 1 ), 5 );
 
   img_ero2 = filtering( img_ero2 );
 
-//  imshow( "Original", img_thrshld);
-//  imshow( "Erosion", img_ero );
-//  imshow( "Erosion2", img_ero2 );
-//  imshow( "Dilate", img_dil );
-//  moveWindow( "Erosion", 200, 200 );
-//  moveWindow( "Original", 0, 200 );
-//  moveWindow( "Dilate", 400, 200 );
-//  moveWindow( "Filtered", 600, 200 );
-//  moveWindow( "Erosion2", 800, 200 );
-//  waitKey(0);
+  imshow( "Original", img_thrshld);
+  imshow( "Erosion", img_ero );
+  imshow( "Erosion2", img_ero2 );
+  imshow( "Dilate", img_dil );
+  moveWindow( "Erosion", 200, 200 );
+  moveWindow( "Original", 0, 200 );
+  moveWindow( "Dilate", 400, 200 );
+  moveWindow( "Filtered", 600, 200 );
+  moveWindow( "Erosion2", 800, 200 );
+  waitKey(0);
 
   //--Reads dial
   dialReading( img_ero2 );
 }
 
-///--Seeks dial place
-Point dial::seekDial(Mat inputImg, int x, int y)
+///--Seeks the dial's place
+Point dial::seekDial(Mat inputImg )
 {
-  while(inputImg.at<uchar>(x, y) == 0){
-    y += 1;
+  //-- Initialization of variables
+  int sum = 0;
+  int maxSum = 0;
+  bool mutex = false;
+  int x = 0, y = 0;
+
+  //-- Loop where looks for the longest string of 1's
+  for( int j = 0; j < inputImg.rows; j++ )
+  {
+    for( int i = 1; i < inputImg.cols; i++ )
+    {
+      //-- If it is found a 0 and afterwards a 1, the semaphore is enabled
+      if( inputImg.at<uchar>( Point( i - 1, j ) ) == 0 && inputImg.at<uchar>( Point( i, j ) ) == 255 )
+      {
+        mutex = true;
+      }
+
+      //-- If the semaphore is activated, counts the number of 1s
+      if( mutex )
+      {
+        sum += 1;
+      }
+
+      //-- If it is found a 1 and afterwards a 0, the semaphore is disabled
+      if( inputImg.at<uchar>( Point( i - 1, j ) ) == 255 && inputImg.at<uchar>( Point( i, j ) ) == 0 )
+      {
+        //-- Detects the longest string of 1's and saves the point where ends
+        if( sum > maxSum )
+        {
+          maxSum = sum;
+          x = i - 1;
+          y = j;
+        }
+
+        //-- Semaphore disabled
+        mutex = false;
+        sum = 0;
+      }
+    }
+    //-- Semaphore disabled
+    sum = 0;
+    mutex = false;
   }
-  Point black(y,x);
-  return black;
+
+  return Point ( x, y );
 }
 
 ///--Binarize Image
@@ -305,13 +346,12 @@ Mat dial::complement( Mat inputImg ){
 Mat dial::filtering( Mat img_orig )
 {
     //--Seeks dial place
-    Point Black = seekDial( img_orig, img_orig.cols / 2, img_orig.rows / 2 );
+    Point Black = seekDial( img_orig );
 
     //--Checks if point is inside the image
     checkFailure( Black, img_orig );
     if( failure ){
-      printf("Failure: fails floodfill in dial %d\n", dialNumber );
-      return img_orig;
+      exit( 0 );
     }
 
     //--Filters image
